@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thời khóa biểu</title>
+    <title>Admin - quản lý sinh viên</title>
     {% load static%}
-    <link rel="stylesheet" href="../static/style/general.css">
-    <link rel="stylesheet" href="../static/style/student_home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'style/general.css' %}">
+    <link rel="stylesheet" href="{% static 'style/admin.css' %}">
 </head>
 <body>
     <div class="container">
+        <!-- 
+        ================================
+        ======== PHẦN BÊN TRÁI =========
+        ================================
+        -->
         <div class="sidebar">
-
             <div class="logo">
                 <img src="{% static 'image/logo_haui.jpg' %}" alt="">
                 <span>HaUI</span>
@@ -22,11 +26,24 @@
                 <a href="https://itc.haui.edu.vn/vn" target="_blank" class="nav-item"><i class="fas fa-th-large"></i>Trung tâm công nghệ thông tin (Sict)</a>
                 <a href="https://sv.haui.edu.vn/" target="_blank" class="nav-item"><i class="fa-solid fa-globe"></i></i>Trang trang đại học điện tử</a>
                 <a href="#" target="_blank" class="nav-item active"><i class="fas fa-clock"></i>Thời khóa biểu</a>
+                <div>
+                    <ul class="main-menu">
+                        <li><i class="fa-solid fa-people-group"></i>Thông tin
+                            <ul class="child-menu">
+                                <li><a href="{% url 'admin_teacher_infor' %}" target="_blank" class="nav-item">Thông tin giảng viên</a></li>
+                                <li><a href="{% url 'admin_student_infor' %}" target="_blank" class="nav-item">Thông tin sinh viên</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>               
             </nav>
         </div>
-
         <div class="main-content">
-
+            <!-- 
+            ================================
+            ======== PHẦN USERNAME =========
+            ================================
+            -->
             <div class="main-content-header">
 
                 <div class="notification-container">
@@ -36,24 +53,44 @@
                         </div>
                     </i>
                 </div>
-                
+                               
                 <div class="get-username" data-student="{{studentId}}">
                     Xin chào, {{ username }}<br> 
-                    <span style="font-size: 16px;">Sinh viên</span>
+                    <span style="font-size: 16px;">Admin</span>
                 </div>
+
                 <i class="fas fa-user-circle profile-icon"></i>
+
             </div>
 
-            <div class="child-main-content">              
-                <div class="classes-list">
+            <div class="child-main-content">   
+                <!-- 
+                =========================================
+                ======== PHẦN NỘI DUNG Ở GIỮA ===========
+                =========================================
+                -->
+                <div class="classes-list">                  
                     <section class="week-view">
                         <h4>Thời khóa biểu</h4>
                         <ul class="week-days"></ul>
                     </section>
-
-                    <div id="timetable-container"></div>
+                    <div class="student-infor">
+                        <div class="student-infor-title">
+                            <h3>Thông tin giảng viên theo khoa</h3>
+                            <form action="" id="search-department-form">
+                                <input type="text" id="department-input" placeholder="Nhập tên khoa" required>
+                                <button type="submit">Xem</button>
+                            </form>
+                        </div>              
+                        <div class="teacher-course-content"></div>
+                    </div>     
                 </div>
 
+                <!-- 
+                =========================================
+                ======== PHẦN NỘI DUNG BÊN PHẢI =========
+                =========================================
+                -->
                 <div class="child-main-content-right">
                     <div class="calendar-widget">
                         <div class="calendar">
@@ -79,20 +116,12 @@
                             </section>
                         </div>
                     </div>
-
-                    <div class="upcoming-events">
-                        <h3>Sự kiện sắp tới</h3>
-                        <div class="event-container"></div>
-                    </div>      
-
                 </div>
-            </div>
+                
+            </div>     
         </div>
     </div>
-
+    <script src="{% static 'style/admin_api.js' %}"></script>
     <script src="{% static 'style/calendar.js' %}"></script>
-    <script src="{% static 'style/student_home_api.js' %}"></script>
-    <script src="{% static 'style/general_student.js' %}"></script>
-    <script src="{% static 'style/general.js' %}"></script>
 </body>
 </html>

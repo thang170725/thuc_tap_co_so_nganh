@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'style/login.css' %}">
+    <!-- <link rel="stylesheet" href="../static/style/login.css"> -->
+</head>
+<body>  
+    <div class="login-container">
+        <div class="login-container-left">
+            <h2>Đăng Nhập</h2>
+            <form method="post">
+                {% csrf_token %}
+                <input type="text" placeholder="Tên đăng nhập" name='username' required>
+                <input type="password" placeholder="Mật khẩu" name='password' required>
+                <button type="submit">Đăng Nhập</button>
+            </form>
+        </div>
+
+        <div>
+            <div class="login-container-right">
+                <img class="logo-haui" src="{% static 'image/logo_haui.jpg' %}" alt="lỗi ảnh">
+                 <!-- <img class="logo-haui" src='../static/image/logo_haui.jpg' alt="lỗi ảnh"> -->
+                <h1>HaUI</h1>
+            </div>
+        </div>
+    </div>
+    
+
+{% if messages %}
+    {% for message in messages %}
+        <script>alert("{{ message }}");</script>
+    {% endfor %}
+{% endif %} 
+
+</body>
+</html>
