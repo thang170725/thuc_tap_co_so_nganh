@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thống kê lịch dạy cá nhân</title>
+    <link rel="stylesheet" href="{% static 'css/teacher_statistics.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Thống kê lịch dạy cá nhân</h1>
+
+    <div class="stats-box">
+        <div class="card">
+            <h3>Tổng số buổi</h3>
+            <p id="total_classes">0</p>
+        </div>
+        <div class="card">
+            <h3>Tổng số giờ</h3>
+            <p id="total_hours">0</p>
+        </div>
+        <div class="card">
+            <h3>Số môn đang dạy</h3>
+            <p id="total_courses">0</p>
+        </div>
+    </div>
+
+    <div id="chart-container">
+        <canvas id="dayChart"></canvas>
+    </div>
+
+    <script src="{% static 'js/teacher_statistics.js' %}"></script>
+</body>
+</html>

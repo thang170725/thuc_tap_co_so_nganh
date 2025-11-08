@@ -1,0 +1,71 @@
+/* === Cấu hình tổng thể === */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* === Tiêu đề trang === */
+h2 {
+    text-align: center;
+    color: #2b5c99;
+    margin-top: 20px;
+}
+
+/* === Bảng hiển thị tài liệu === */
+#materials-container {
+    width: 90%;
+    margin: 30px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#materials-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#materials-container th,
+#materials-container td {
+    border-bottom: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+#materials-container th {
+    background-color: #2b5c99;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#materials-container tr:hover {
+    background-color: #f1f7ff;
+}
+
+/* === Nút hoặc liên kết quay lại === */
+.back-button {
+    display: inline-block;
+    margin: 15px 5%;
+    background-color: #2b5c99;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.back-button:hover {
+    background-color: #1a4370;
+}
+
+/* === Thông báo trống === */
+#materials-container p {
+    text-align: center;
+    font-style: italic;
+    color: #666;
+}

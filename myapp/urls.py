@@ -13,6 +13,18 @@ urlpatterns = [
     path('api/course-detail/<str:course_id>/', views.course_detail_api, name='course_detail_api'),
     path('api/student-infor-detail/<str:student_id>/', views.student__infor_detail_api, name='student_infor_detail_api'),
     path("api/events/", views.get_events_api, name="get_events_api"),
+    # quản lý tài liệu
+    path("api/get_materials/", views.get_materials, name="get_materials"),
+    path("api/upload_material/", views.upload_material, name="upload_material"),
+    path('teacher/home/', views.teacher_home, name='teacher_home'),
+    path('teacher/materials/', views.teacher_materials, name='teacher_materials'),
+    # quản lý thống kê lịch giảng dạy 
+    path("teacher/statistics/", views.teacher_statistics_view, name="teacher_statistics"),
+    path("api/teacher/statistics/", views.teacher_statistics_api, name="teacher_statistics_api"),
+    # quản lý điểm 
+    
+    # API trả dữ liệu JSON cho JS
+    path('api/materials/', views.get_materials, name='api_get_materials'),
     # đường dẫn trang admin
     path("admin_home/", views.admin_home, name="admin_home"),
     path('admin_home/teacher-infor/', views.admin_teacher_infor, name='admin_teacher_infor'),

@@ -179,3 +179,14 @@ class Announcements(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.senderRole})"
+    
+class Materials(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    file = models.FileField(upload_to='materials/', blank=True, null=True)
+    upload_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+    
+# Bảng đang cân nhắc:

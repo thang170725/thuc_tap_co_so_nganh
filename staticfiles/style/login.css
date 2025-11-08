@@ -1,0 +1,173 @@
+/* 
+===============================================
+========== CSS TRANG LOGIN ====================
+===============================================
+*/
+@import url('https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+:root{
+    --class-border: #a59f9f;
+    --class-shadow: #525050;
+    --class-bg: #ddd;
+    --class-theme: rgb(20, 63, 155);
+    --class-theme1: #1bc323;
+    --class-border-light: rgb(34, 90, 212);
+}
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('../image/bg.png');
+    background-position: center;
+    background-size: cover;
+}
+/* 
+=========================================================
+========== CSS KHỐI BAO NGOÀI & TIÊU ĐỀ =================
+=========================================================
+*/
+.big-container{
+    width: 70vw;
+    height: 80vh;
+    background-color: transparent;
+    border: 1px solid var(--class-border);
+    border-radius: 20px;
+    box-shadow: 0 0 15px var(--class-theme);
+    backdrop-filter: blur(8px);
+}
+.big-container-title h1{
+    text-align: center;
+    color: var(--class-theme);
+    border-bottom: 1px solid var(--class-border-light);
+    padding: 10px 0;
+    padding-bottom: 10px;
+    text-shadow: 0 0 35px #fff;
+}
+/* 
+===============================================
+========== CSS KHU VỰC LOGIN ==================
+===============================================
+*/
+.container {
+    display: flex;
+}
+/* 
+===============================================
+========== CSS KHU VỰC LOGIN BÊN TRÁI =========
+===============================================
+*/
+.left {
+    width: 55%;
+    color: var(--class-theme);
+    margin-left: 5%;
+}
+
+.left-title {
+    margin-top: 15%;
+    margin-left: 10%;
+    font-size: 40px;
+    margin-bottom: 2%;
+}
+
+.login {
+    width: 85%;
+    margin-left: 12%;
+    font-size: 22px;
+    
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.input-group input {
+    width: 68%;
+    height: 44px;
+    margin-bottom: 10px;
+    border-radius: 7px;
+    padding: 0 10px;
+    background-color: transparent;
+}
+
+.login-content a {
+    color: rgb(61, 61, 214);
+    text-decoration: none;
+}
+
+.input-forgot {
+    text-align: right;
+    width: 70%;
+    font-size: 16px;
+}
+
+.input-forgot a {
+    margin-right: 15px;
+}
+
+.signin{
+    width: 68%;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 50px;
+    background-color: var(--class-theme);
+    height: 40px;
+    border-radius: 10px;
+    color: #f5f8fa;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+}
+
+.signin:hover {
+    background-color: var(--class-theme1);
+    transition: all .5s;
+}
+
+.warning-message {
+  color: #f00;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: left;
+}
+
+.login-content-form p{
+    width: 70%;
+    text-align: center;
+    font-size: 18px;
+}
+
+.login-content-form p a {
+    text-decoration: none;
+}
+
+/* 
+===============================================
+========== CSS KHU VỰC LOGIN BÊN PHẢI =========
+===============================================
+*/
+.right {
+    width: 55%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.right img {
+    width: 55%;
+    border-radius: 30px;
+    box-shadow: 0 0 25px var(--class-theme);
+}
+

@@ -10,6 +10,10 @@ from django.utils import timezone
 import json
 from django.utils.dateparse import parse_datetime
 from django.views.decorators.csrf import csrf_exempt
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+from .models import Materials
+import os
 '''
 ==============================================================
 =================== VIEWS LOGIN CHUYÊN ROLE ==================
@@ -487,3 +491,164 @@ def admin_teacher_infor(request):
 def admin_student_infor(request):
     return render(request, 'admin_student_infor.html')
 
+'''
+==============================================================
+=============== Quản lý học liệu do giảng viên gửi ======================
+==============================================================
+'''
+@csrf_exempt
+def get_materials(request):
+    teacher_id = request.session.get("userId")
+    course_id = request.GET.get("courseId")
+
+    if not teacher_id:
+        return JsonResponse({"error": "Chưa đăng nhập"}, status=401)
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT m.materialId, m.title, m.filePath, m.createdAt, c.courseName
+                FROM Materials m
+                JOIN Courses c ON m.courseId = c.courseId
+                WHERE m.teacherId = %s AND (%s IS NULL OR m.courseId = %s)
+                ORDER BY m.createdAt DESC
+            """, [teacher_id, course_id, course_id])
+            rows = cursor.fetchall()
+
+        materials = [{
+            "materialId": r[0],
+            "title": r[1],
+            "filePath": r[2],
+            "createdAt": str(r[3]),
+            "courseName": r[4]
+        } for r in rows]
+
+        return JsonResponse({"materials": materials})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+def teacher_materials(request):
+    if 'userId' not in request.session:
+        return redirect('login')
+    username = request.session.get('username', 'Giảng viên')
+    return render(request, 'teacher_materials.html', {'username': username})
+
+def teacher_home(request):
+    return render(request, 'teacher_home.html')
+
+def teacher_materials(request):
+    return render(request, 'teacher_materials.html')
+
+def get_materials(request):
+    materials = Materials.objects.all().values('materialId', 'courseId', 'title', 'description', 'uploadDate')
+    return JsonResponse(list(materials), safe=False)
+
+@csrf_exempt
+def upload_material(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Chỉ hỗ trợ POST"}, status=405)
+
+    teacher_id = request.session.get("userId")
+    course_id = request.POST.get("courseId")
+    title = request.POST.get("title")
+    file = request.FILES.get("file")
+
+    if not all([teacher_id, course_id, title, file]):
+        return JsonResponse({"error": "Thiếu dữ liệu"}, status=400)
+
+    try:
+        # Lưu file vào thư mục /media/materials/
+        fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "materials"))
+        filename = fs.save(file.name, file)
+        file_url = fs.url("materials/" + filename)
+
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO Materials (courseId, teacherId, title, filePath, createdAt)
+                VALUES (%s, %s, %s, %s, %s)
+            """, [course_id, teacher_id, title, file_url, timezone.now()])
+
+        return JsonResponse({"message": "Tải lên thành công!", "fileUrl": file_url})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+'''
+==============================================================
+=============== Xem thống kê lịch dạy cá nhân ======================
+==============================================================
+'''
+# --- Hàm lấy TKB có sẵn ---
+def fetch_timetable_teacher(user_id):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT c.courseId, c.courseName, sch.startTime, sch.endTime, sch.dayOfWeek, r.roomId, r.capacity
+            FROM Teachers t
+            JOIN Courses c ON t.teacherId = c.teacherId
+            JOIN Schedules sch ON c.courseId = sch.courseId
+            JOIN Rooms r ON sch.roomId = r.roomId
+            WHERE t.teacherId = %s
+            ORDER BY t.teacherId;
+        """, [user_id])
+        rows = cursor.fetchall()
+
+    timetable = defaultdict(list)
+    for courseId, courseName, startTime, endTime, dayOfWeek, roomId, capacity in rows:
+        timetable[dayOfWeek].append({
+            "courseId": courseId,
+            "courseName": courseName,
+            "start": str(startTime),
+            "end": str(endTime),
+            "dayOfWeek": dayOfWeek,
+            "room": roomId,
+            "capacity": capacity
+        })
+
+    days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    return {day: timetable.get(day, []) for day in days}
+
+
+# --- API lấy thống kê ---
+def teacher_statistics_api(request):
+    user_id = request.session.get("userId")  # Lấy từ session
+    if not user_id:
+        return JsonResponse({"error": "Chưa đăng nhập"}, status=403)
+
+    timetable = fetch_timetable_teacher(user_id)
+
+    total_classes = 0
+    total_hours = 0
+    courses_set = set()
+    per_day_count = {day: 0 for day in timetable.keys()}
+
+    for day, sessions in timetable.items():
+        for s in sessions:
+            start = datetime.strptime(s["start"], "%H:%M:%S")
+            end = datetime.strptime(s["end"], "%H:%M:%S")
+            hours = (end - start).seconds / 3600
+            total_hours += hours
+            total_classes += 1
+            courses_set.add(s["courseId"])
+            per_day_count[day] += 1
+
+    stats = {
+        "total_classes": total_classes,
+        "total_hours": total_hours,
+        "total_courses": len(courses_set),
+        "per_day": per_day_count,
+    }
+
+    return JsonResponse(stats)
+
+
+# --- Trang giao diện ---
+def teacher_statistics_view(request):
+    return render(request, "teacher_statistics.html")
+
+'''
+==============================================================
+=============== Quản lý điểm sinh viên ======================
+==============================================================
+'''

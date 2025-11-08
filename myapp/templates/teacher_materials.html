@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý học liệu</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style/general.css' %}">
+    <link rel="stylesheet" href="{% static 'style/teacher_home.css' %}">
+    <link rel="stylesheet" href="{% static 'style/teacher_materials.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <img src="../static/image/logo_haui.jpg" alt="HaUI Logo">
+                <span>HaUI</span>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="{% url 'teacher_home' %}" class="nav-item">
+                    <i class="fas fa-clock"></i> Thời khóa biểu
+                </a>
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-book"></i> Tài liệu
+                </a>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <div class="main-content-header">
+                <div class="get-username">Xin chào, {{ username }}</div>
+            </div>
+
+            <div class="child-main-content">
+                <div class="manage-materials">
+                    <h4>📘 Quản lý học liệu</h4>
+
+                    <!-- Form upload -->
+                    <form id="material-form" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="title">
+                            <label>Mã Môn:</label>
+                            <input type="text" id="courseId" name="courseId" required>
+                        </div>
+                        <div class="title">
+                            <label>Tiêu đề học liệu:</label>
+                            <input type="text" id="title" name="title" required>
+                        </div>
+                        <div class="file-upload">
+                            <label>Chọn tệp:</label>
+                            <input type="file" id="fileInput" name="file" required>
+                        </div>
+                        <button type="button" class="signin" onclick="uploadMaterial()">Tải lên</button>
+                    </form>
+                    <p id="upload-msg" style="color: green;"></p>
+
+                    <hr>
+
+                    <!-- Bảng danh sách -->
+                    <h4>Danh sách học liệu</h4>
+                    <table id="materials-table" border="1" style="width:100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th>Mã môn</th>
+                                <th>Tiêu đề</th>
+                                <th>File</th>
+                                <th>Ngày tải lên</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                    <!-- Vùng dữ liệu bổ sung (từ materials.js) -->
+                    <hr>
+                    <h4>Danh sách tài liệu giảng viên (API khác)</h4>
+                    <div id="materials-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script -->
+    <script src="{% static 'style/teacher_materials.js' %}"></script>
+    <script src="{% static 'style/materials.js' %}"></script>
+</body>
+</html>
