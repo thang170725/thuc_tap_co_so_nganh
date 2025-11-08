@@ -1,0 +1,244 @@
+create database MyDatabase
+	character set = utf8mb4
+    collate = utf8mb4_unicode_ci;
+use MyDatabase;
+create table Users(
+	userId varchar(20),
+    passwordHash varchar(255),
+    email varchar(100),
+    role enum('admin', 'teacher', 'student' ),
+    primary key (userId)
+);
+select * from Users;
+create table Students(
+	studentId varchar(20), 
+    fullName varchar(50),
+    major varchar(100),
+    className varchar(100),
+    primary key (studentId),
+    constraint fk_userId_Users_Students foreign key (studentId) references Users(userId)
+);
+create table Teachers(
+	teacherId varchar(20),
+    fullName varchar(50),
+    department varchar(100),
+    primary key (teacherId),
+    constraint fk_userId_Users_Teachers foreign key (teacherId) references Users(userId)
+);
+create table Admins(
+	adminId varchar(20),
+    fullName varchar(50),
+    primary key (adminId),
+    constraint fk_userId_Users_Admins foreign key (adminId) references Users(userId)
+);
+create table Courses(
+	courseId varchar(20),
+    courseName varchar(100),
+    credits int,
+    descriptions text,
+    teacherId varchar(20),
+    primary key (courseId),
+    constraint fk_teacherId_Courses_Teachers foreign key (teacherId) references Teachers(teacherId)
+);
+update Courses
+set 
+	credits = 3,
+    descriptions = 
+"Toán cao cấp là môn học nền tảng cung cấp các kiến thức toán học liên tục để phục vụ cho các ngành kỹ thuật, khoa học và công nghệ.
+Nội dung chính thường gồm:
+Giải tích 1: Giới hạn, đạo hàm, tích phân, chuỗi.
+Giải tích 2: Hàm nhiều biến, vi phân – tích phân bội, trường vector.
+Đại số tuyến tính: Ma trận, định thức, vector, không gian vector, hệ phương trình tuyến tính, giá trị riêng.
+Mục tiêu:
+Giúp sinh viên hiểu bản chất của biến đổi, xấp xỉ và tối ưu hóa, là nền tảng cho các lĩnh vực như AI, Machine Learning, xử lý tín hiệu, mô phỏng vật lý.
+Tóm lại: Toán cao cấp giúp ta “hiểu được thế giới liên tục” — nền tảng để mô hình hóa và tối ưu trong khoa học máy tính."
+where courseId = '1';
+SELECT 
+          c.courseId,
+          c.courseName,
+          c.credits,
+          c.descriptions
+        FROM Courses c
+        WHERE c.courseId = '1'
+select * from Courses;
+create table Students_Courses(
+	id varchar(20),
+    studentId varchar(20),
+    courseId varchar(20),
+    primary key (id),
+    constraint fk_studentId_Students_Courses_Students foreign key (studentId) references Students(studentId),
+    constraint fk_courseId_Students_Courses_Courses foreign key (courseId) references Courses(courseId)
+);
+select * from Students_Courses;
+alter table Students_Courses modify column id int auto_increment;
+INSERT INTO Courses (courseId, courseName, teacherId) VALUES
+('1', 'Toán Cao Cấp', 'gv2023600455'),
+('2', 'Cơ Sở Dữ Liệu', 'gv2023600455'),
+('3', 'Trí Tuệ Nhân Tạo', 'gv2023600455');
+select * from Courses;
+
+-- Sinh viên 1 học cả Toán Cao Cấp và CSDL
+INSERT INTO Students_Courses (id, studentId, courseId) VALUES
+('5','2023600456', '1'),
+('4', '2023600456', '2');
+
+SELECT s.studentId, s.fullName, c.courseName, t.teacherId, t.fullName
+FROM Students_Courses st
+JOIN Students s ON st.studentId = s.studentId
+JOIN Courses c ON st.courseId = c.courseId
+JOIN Teachers t ON c.teacherId = t.teacherId
+ORDER BY s.studentId;
+
+show tables;
+
+drop table myapp_users;
+drop table myapp_student;
+
+create table Rooms(
+	roomId varchar(20),
+    roomNumber varchar(20),
+    capacity int,
+    building varchar(20),
+    primary key (roomId)
+);
+
+insert into Rooms (roomId, roomNumber, capacity, building)
+values
+('A7_304', '304', 75, 'A7');
+
+
+create table Schedules(
+	scheduleId varchar(20),
+    courseId varchar(20),
+    roomId varchar(20),
+    startTime time,
+    endTime time,
+    dayOfWeek ENUM('Mon','Tue','Wed','Thu','Fri','Sat', 'Sum'),
+    weekNumber int,
+    primary key (scheduleId),
+    constraint fk_roomId_Schedules_Rooms foreign key (roomId) references Rooms(roomId),
+    CONSTRAINT fk_courseId_Schedules_Courses FOREIGN KEY (courseId) REFERENCES Courses(courseId)
+);
+
+-- thời khóa biểu của sinh viên
+SELECT c.courseId, s.fullName, c.courseName, t.fullName, sch.startTime, sch.endTime, sch.dayOfWeek, r.roomId
+FROM Students s
+JOIN Students_Courses sc ON s.studentId = sc.studentId
+JOIN Courses c ON sc.courseId = c.courseId
+JOIN Teachers t ON c.teacherId = t.teacherId
+join Schedules sch on c.courseId = sch.courseId
+join Rooms r on sch.roomId = r.roomId
+where s.studentId = '2023600455'
+ORDER BY s.studentId;
+
+CREATE TABLE Classes (
+    classId VARCHAR(20) PRIMARY KEY,
+    courseId VARCHAR(20),
+    teacherId VARCHAR(20),
+    semester VARCHAR(20),
+    constraint fk_courseId_Classes_Courses FOREIGN KEY (courseId) REFERENCES Courses(courseId),
+    constraint fk_teacherId_Classes_Teachers FOREIGN KEY (teacherId) REFERENCES Teachers(teacherId)
+);
+select * from Announcements;
+create table Announcements(
+	announcementId int auto_increment,
+    senderId varchar(20),
+    senderRole enum('teacher', 'admin'),
+    classId varchar(20),
+    courseId varchar(20),
+    title varchar(255),
+    content text,
+    createdAt timestamp default current_timestamp,
+    primary key (announcementId),
+    constraint fk_senderId_Announcements_Users foreign key (senderId) references Users(userId),
+    constraint fk_courseId_Announcements_Courses foreign key (courseId) references Courses(courseId),
+    constraint fk_classId_Announcements_Classes foreign key (classId) references Classes(classId)
+);
+
+SELECT a.title, a.content, a.createdAt, sc.studentId, s.fullName AS senderName
+FROM Announcements a
+JOIN Classes c ON a.classId = c.classId
+
+JOIN Students_Courses sc ON c.courseId = sc.courseId
+join Students s on sc.studentId = s.studentId 
+JOIN Users u ON a.senderId = u.userId;
+
+SELECT a.title, a.content, a.createdAt, s.fullName AS senderName
+      FROM Announcements a
+      JOIN Classes c ON a.classId = c.classId
+      JOIN Students_Courses sc ON c.courseId = sc.courseId
+      JOIN Students s ON a.senderId = s.studentId
+      WHERE sc.studentId = '2023600455'
+      ORDER BY a.createdAt DESC;
+      
+-- Lịch dạy của giáo viên --------------
+select t.fullName, c.courseId , c.courseName, sch.startTime, sch.endTime, sch.dayOfWeek, r.roomNumber, r.capacity, r.building
+	from Teachers t
+    join Courses c on c.teacherId = t.teacherId
+    join Schedules sch on c.courseId = sch.courseId
+    join Rooms r on sch.roomId = r.roomId;
+SELECT a.title, a.content, a.createdAt, t.fullName AS senderName
+FROM Announcements a
+JOIN Courses c ON a.courseId = c.courseId
+JOIN Teachers t ON c.teacherId = t.teacherId
+JOIN Students_Courses sc ON c.courseId = sc.courseId
+JOIN Students s ON sc.studentId = s.studentId
+ORDER BY a.createdAt DESC;
+
+create table Students_Classes(
+	id int auto_increment primary key,
+    studentId varchar(20),
+    classId varchar(20),
+    foreign key (studentId) references Students(studentId),
+    foreign key (classId) references Classes(classId)
+);
+
+SELECT 
+    c.courseId,
+    c.courseName,
+    cl.classId,
+    t.fullName AS teacherName,
+    s.studentId,
+    s.fullName AS studentName,
+    s.major,
+    s.className
+FROM Courses c
+JOIN Classes cl ON c.courseId = cl.courseId
+JOIN Teachers t ON cl.teacherId = t.teacherId
+JOIN Students_Classes sc ON cl.classId = sc.classId
+JOIN Students s ON sc.studentId = s.studentId
+WHERE c.courseId = '2';
+select * from Classes;
+select * from Courses;
+select * from Students;
+SELECT * FROM Students_Classes;
+SELECT * FROM Courses WHERE courseId = '2';
+SELECT * FROM Classes WHERE courseId = '2';
+SELECT * FROM Teachers WHERE teacherId = 'gv2023600455';
+SELECT * FROM Students_Classes WHERE classId = 'CL01';
+INSERT INTO Students_Classes (studentId, classId)
+VALUES ( '2023600455', 'CL01');
+
+SELECT sc.* 
+FROM Students_Classes sc
+JOIN Classes cl ON sc.classId = cl.classId
+WHERE cl.courseId = '2';
+INSERT INTO Classes (classId, courseId, teacherId)
+VALUES ('CL01', '2', 'gv2023600455');
+CREATE TABLE Events (
+    eventId INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255),
+    time DATETIME,
+    receiver VARCHAR(100) DEFAULT 'ALL',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+drop table Events;
+CREATE TABLE Events (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    time DATETIME NOT NULL,
+    receiver ENUM('ALL', 'STUDENT', 'TEACHER') DEFAULT 'ALL',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+select * from Events;
+
