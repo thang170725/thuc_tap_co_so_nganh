@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ form_title }}{% endblock title %}
+
+{% block content %}
+<div style="padding: 20px; background-color: white; margin: 20px; border-radius: 8px;">
+    <h2 style="border-bottom: 2px solid #eee; padding-bottom: 10px;">{{ form_title }}</h2>
+
+    <form method="POST" novalidate style="margin-top: 20px;">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger" style="color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; padding: 10px; border-radius: 5px;">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div style="margin-bottom: 15px;">
+            <label for="{{ form.title.id_for_label }}" style="display: block; margin-bottom: 5px; font-weight: bold;">{{ form.title.label }}:</label>
+            {{ form.title }} {% if form.title.errors %}
+                <div style="color: #dc3545; font-size: 0.9em; margin-top: 5px;">{{ form.title.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="{{ form.time.id_for_label }}" style="display: block; margin-bottom: 5px; font-weight: bold;">{{ form.time.label }}:</label>
+            {{ form.time }}
+            {% if form.time.errors %}
+                <div style="color: #dc3545; font-size: 0.9em; margin-top: 5px;">{{ form.time.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="{{ form.receiver.id_for_label }}" style="display: block; margin-bottom: 5px; font-weight: bold;">{{ form.receiver.label }}:</label>
+            {{ form.receiver }}
+            {% if form.receiver.errors %}
+                <div style="color: #dc3545; font-size: 0.9em; margin-top: 5px;">{{ form.receiver.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <hr style="margin-top: 25px;">
+
+        <button type="submit" class="btn btn-success" style="padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Lưu thay đổi</button>
+        <a href="{% url 'event_management' %}" class="btn btn-secondary" style="padding: 10px 15px; background-color: #6c757d; color: white; border: none; border-radius: 5px; text-decoration: none; margin-left: 10px; font-size: 16px;">Hủy bỏ</a>
+    </form>
+</div>
+{% endblock content %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quản lý Sự kiện{% endblock title %}
+
+{% block role_specific_links %}
+    <div>
+        <ul class="main-menu">
+            <li><i class="fa-solid fa-people-group"></i>Thông tin
+                <ul class="child-menu">
+                    <li><a href="{% url 'admin_teacher_infor' %}" class="nav-item">Thông tin giảng viên</a></li>
+                    <li><a href="{% url 'admin_student_infor' %}" class="nav-item">Thông tin sinh viên</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>  
+    <a href="{% url 'event_management' %}" class="nav-item active"><i class="fas fa-calendar-check"></i> Quản lý Sự kiện</a>
+{% endblock role_specific_links %}
+
+{% block user_info %}
+    <div class="get-username">
+        Xin chào, {{ user.username }}<br> 
+        <span style="font-size: 16px;">Admin</span>
+    </div>
+{% endblock user_info %}
+
+{% block content %}
+<div style="padding: 20px; background-color: white; margin: 20px; border-radius: 8px;">
+    <h2 style="border-bottom: 2px solid #eee; padding-bottom: 10px;">Quản lý Sự kiện</h2>
+    <p style="margin-top: 20px;">
+        <a href="{% url 'event_create' %}" style="text-decoration: none; padding: 10px 15px; background-color: #007bff; color: white; border-radius: 5px; font-weight: bold;">
+            + Thêm sự kiện mới
+        </a>
+    </p>
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding: 15px; margin: 20px 0; border-radius: 5px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+            <tr style="background-color: #f8f9fa;">
+                <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Tiêu đề</th>
+                <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Thời gian</th>
+                <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Đối tượng</th>
+                <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+            <tr>
+                <td style="padding: 12px; border: 1px solid #ddd;">{{ event.title }}</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">{{ event.time|date:"H:i, d/m/Y" }}</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">{{ event.get_receiver_display }}</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">
+                    <a href="{% url 'event_update' event.id %}" style="color: #ffc107; text-decoration: none; font-weight: bold;">Sửa</a>
+                    <a href="{% url 'event_delete' event.id %}" style="color: #dc3545; text-decoration: none; margin-left: 15px; font-weight: bold;">Xóa</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="padding: 12px; border: 1px solid #ddd; text-align: center;">Chưa có sự kiện nào.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

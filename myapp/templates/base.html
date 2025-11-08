@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HaUI Schedule{% endblock title %}</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'style/general.css' %}">
+    
+    {% block page_css %}{% endblock %}
+
+    <style>
+       .profile-dropdown-header { padding: 10px 16px; font-size: 1.1em; font-weight: bold; color: #333; border-bottom: 1px solid #eee; }
+       .profile-container { position: relative; display: flex; align-items: center; cursor: pointer; }
+       .profile-dropdown { display: none; position: absolute; top: 100%; right: 0; background-color: white; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 1000; min-width: 200px; overflow: hidden; }
+       .profile-dropdown a { display: block; padding: 12px 16px; color: #333; text-decoration: none; font-size: 15px; }
+       .profile-dropdown a:hover { background-color: #f5f5f5; }
+       .profile-dropdown a i { margin-right: 10px; color: #555; width: 16px; }
+       .profile-dropdown.show { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <img src="{% static 'image/logo_haui.jpg' %}" alt="">
+                <span>HaUI</span>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="https://itc.haui.edu.vn/vn" target="_blank" class="nav-item"><i class="fas fa-th-large"></i>Trung tâm công nghệ thông tin (Sict)</a>
+                <a href="https://sv.haui.edu.vn/" target="_blank" class="nav-item"><i class="fa-solid fa-globe"></i></i>Trang trang đại học điện tử</a>
+                
+                {% if request.session.role == 'admin' %}
+                    {% url 'admin_home' as homepage_url %}
+                
+                {% elif request.session.role == 'teacher' %}
+                    {% url 'teacher_home' as homepage_url %}
+                
+                {% elif request.session.role == 'student' %}
+                    {% url 'student_home' as homepage_url %}
+                
+                {% else %}
+                    {% url 'login' as homepage_url %}
+                {% endif %}
+
+                <a href="{{ homepage_url }}" class="nav-item {% block timetable_active %}{% endblock %}">
+                    <i class="fas fa-clock"></i>Thời khóa biểu
+                </a>
+
+                {% block role_specific_links %}
+                {% endblock role_specific_links %}
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <div class="main-content-header">
+                <div class="notification-container">
+                    <i class="fas fa-bell" id="bell-icon">
+                        <div class="information" id="announcement-container"></div>
+                    </i>
+                </div>
+                
+                <div class="profile-container" id="profile-trigger">
+                    {% block user_info %}
+                        {% endblock user_info %}
+                    
+                    <i class="fas fa-user-circle profile-icon"></i>
+
+                    <div class="profile-dropdown" id="profile-menu">
+                        <div class="profile-dropdown-header">Quản lý tài khoản</div>
+                        <a href="{% url 'profile_management' %}"><i class="fas fa-edit"></i> Cập nhật thông tin</a>
+                        <a href="{% url 'custom_password_change' %}"><i class="fas fa-key"></i> Đổi mật khẩu</a>
+                        <a href="{% url 'custom_logout' %}"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="child-main-content">    
+                {% block content %}
+                {% endblock content %}
+            </div>     
+        </div>
+    </div>
+
+    <script src="{% static 'style/calendar.js' %}"></script>
+    <script src="{% static 'style/general.js' %}"></script>
+    {% block scripts %}{% endblock scripts %}
+    <script>
+        // (Code JS cho menu dropdown, giữ nguyên)
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileTrigger = document.getElementById('profile-trigger');
+            const profileMenu = document.getElementById('profile-menu');
+            if (profileTrigger && profileMenu) {
+                profileTrigger.addEventListener('click', function(event) {
+                    event.stopPropagation(); 
+                    profileMenu.classList.toggle('show');
+                });
+            }
+            window.addEventListener('click', function(event) {
+                if (profileMenu && profileMenu.classList.contains('show')) {
+                    if (!profileMenu.contains(event.target)) {
+                        profileMenu.classList.remove('show');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -15,6 +15,129 @@ from django.views.decorators.csrf import csrf_exempt
 =================== VIEWS LOGIN CHUYÊN ROLE ==================
 ==============================================================
 '''
+# myapp/views.py
+# ... (các import cũ của bạn) ...
+
+# --- ĐẢM BẢO BẠN ĐÃ IMPORT NHỮNG THỨ NÀY ---
+from django.db import connection
+from django.contrib.auth import logout # (Vẫn dùng logout của Django để xóa session)
+from .forms import ProfileUpdateForm, CustomPasswordChangeForm
+from .models import Users, Students, Teachers, Admins
+# -------------------------------------------
+
+
+#
+# --- 1. THAY THẾ HÀM NÀY ---
+#
+def profile_management(request):
+    # Dùng hệ thống session của bạn
+    user_id = request.session.get('userId')
+    if not user_id:
+        return redirect('login') 
+    
+    try:
+        user_obj = Users.objects.get(userId=user_id)
+    except Users.DoesNotExist:
+        messages.error(request, 'Lỗi: Không tìm thấy hồ sơ người dùng.')
+        return redirect('login') 
+
+    profile_obj = None
+    try:
+        if user_obj.role == 'student':
+            profile_obj = Students.objects.get(studentId=user_obj)
+        elif user_obj.role == 'teacher':
+            profile_obj = Teachers.objects.get(teacherId=user_obj)
+        elif user_obj.role == 'admin':
+            profile_obj = Admins.objects.get(adminId=user_obj)
+    except (Students.DoesNotExist, Teachers.DoesNotExist, Admins.DoesNotExist):
+        pass # Bỏ qua nếu không có (ví dụ: admin không có trong bảng Admins)
+
+    if request.method == 'POST':
+        profile_form = ProfileUpdateForm(request.POST)
+        if profile_form.is_valid():
+            new_email = profile_form.cleaned_data['email']
+            new_fullName = profile_form.cleaned_data['fullName']
+            
+            try:
+                # Dùng raw SQL (giống login_view của bạn)
+                with connection.cursor() as cursor:
+                    # Cập nhật Bảng Users
+                    cursor.execute(
+                        "UPDATE Users SET email = %s WHERE userId = %s",
+                        [new_email, user_id]
+                    )
+                    
+                    # Cập nhật Bảng Students/Teachers/Admins
+                    if profile_obj:
+                        table_name = profile_obj._meta.db_table
+                        id_field = profile_obj._meta.pk.name
+                        cursor.execute(
+                            f"UPDATE {table_name} SET fullName = %s WHERE {id_field} = %s",
+                            [new_fullName, user_id]
+                        )
+                
+                messages.success(request, 'Cập nhật thông tin thành công!')
+                return redirect('profile_management')
+            except Exception as e:
+                messages.error(request, f'Lỗi cơ sở dữ liệu: {e}')
+    else:
+        # GET: Hiển thị thông tin hiện tại
+        profile_form = ProfileUpdateForm(initial={
+            'email': user_obj.email, 
+            'fullName': profile_obj.fullName if profile_obj else ''
+        })
+
+    context = {
+        'profile_form': profile_form,
+        'user_profile': user_obj # Gửi user_profile để base.html hiển thị sidebar
+    }
+    return render(request, 'profile_management.html', context)
+
+#
+# --- 2. THAY THẾ HÀM NÀY ---
+#
+def custom_password_change(request):
+    user_id = request.session.get('userId')
+    if not user_id:
+        return redirect('login')
+
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(request.POST)
+        if form.is_valid():
+            new_password = form.cleaned_data['new_password1']
+            
+            try:
+                # Dùng raw SQL (giống login_view của bạn)
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        "UPDATE Users SET passwordHash = %s WHERE userId = %s",
+                        [new_password, user_id]
+                    )
+                
+                logout(request) # Xóa session
+                messages.success(request, 'Đổi mật khẩu thành công! Vui lòng đăng nhập lại.')
+                return redirect('login') 
+            except Exception as e:
+                messages.error(request, f'Lỗi cơ sở dữ liệu: {e}')
+        else:
+            # Lỗi (ví dụ: 2 mật khẩu không khớp) sẽ được giữ lại trong 'form'
+            messages.error(request, 'Đổi mật khẩu thất bại. Vui lòng kiểm tra lại.')
+    else:
+        form = CustomPasswordChangeForm()
+
+    context = {
+        'form': form,
+        'user_profile': Users.objects.get(userId=user_id) # Gửi user_profile
+    }
+    return render(request, 'password_change.html', context)
+
+#
+# --- 3. THAY THẾ/THÊM HÀM NÀY ---
+#
+def custom_logout_view(request):
+    logout(request) # Hàm này chỉ xóa session, rất an toàn
+    messages.info(request, 'Bạn đã đăng xuất.')
+    return redirect('login')
 def login_view(request):
   if request.method == "POST":
     username = request.POST.get('username') # lấy tài khoản trong trang login

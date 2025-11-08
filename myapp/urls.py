@@ -20,4 +20,7 @@ urlpatterns = [
     path("api/admin_course_detail/<str:course_id>/", views.admin_course_detail_api, name="admin_course_detail_api"),
     path("api/department_teacher/<str:department>/", views.department_teacher_api, name="department_teacher_api"),
     path("api/admin_event/", views.admin_event_api, name="admin_event_api"),
+    path('profile/', views.profile_management, name='profile_management'),
+    path('password_change/', views.custom_password_change, name='custom_password_change'),
+    path('logout/', views.custom_logout_view, name='custom_logout'),
 ]

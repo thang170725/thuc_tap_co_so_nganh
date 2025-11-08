@@ -1,132 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thời khóa biểu</title>
-    {% load static%}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="../static/style/admin.css">
-    <link rel="stylesheet" href="../static/style/general.css">
-</head>
-<body>
-    <div class="container">
-        <!-- 
-        ================================
-        ======== PHẦN BÊN TRÁI =========
-        ================================
-        -->
-        <div class="sidebar">
-            <div class="logo">
-                <img src="{% static 'image/logo_haui.jpg' %}" alt="">
-                <span>HaUI</span>
-            </div>
+{% extends 'base.html' %}
+{% load static %}
 
-            <nav class="nav-menu">
-                <a href="https://itc.haui.edu.vn/vn" target="_blank" class="nav-item"><i class="fas fa-th-large"></i>Trung tâm công nghệ thông tin (Sict)</a>
-                <a href="https://sv.haui.edu.vn/" target="_blank" class="nav-item"><i class="fa-solid fa-globe"></i></i>Trang trang đại học điện tử</a>
-                <a href="#" target="_blank" class="nav-item active"><i class="fas fa-clock"></i>Thời khóa biểu</a>
-                <div>
-                    <ul class="main-menu">
-                        <li><i class="fa-solid fa-people-group"></i>Thông tin
-                            <ul class="child-menu">
-                                <li><a href="{% url 'admin_teacher_infor' %}" target="_blank" class="nav-item">Thông tin giảng viên</a></li>
-                                <li><a href="{% url 'admin_student_infor' %}" target="_blank" class="nav-item">Thông tin sinh viên</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>               
-            </nav>
-        </div>
-        <div class="main-content">
-            <!-- 
-            ================================
-            ======== PHẦN USERNAME =========
-            ================================
-            -->
-            <div class="main-content-header">
+{% block title %}Trang Quản trị{% endblock title %}
 
-                <div class="notification-container">
-                    <i class="fas fa-bell" id="bell-icon">
-                        <div class="information" id="announcement-container">
-                            <!-- nội dung thông báo ở đây -->
-                        </div>
-                    </i>
-                </div>
-                               
-                <div class="get-username" data-student="{{studentId}}">
-                    Xin chào, {{ username }}<br> 
-                    <span style="font-size: 16px;">Admin</span>
-                </div>
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'style/admin.css' %}">
+{% endblock %}
 
-                <i class="fas fa-user-circle profile-icon"></i>
+{% block timetable_active %}active{% endblock %}
 
-            </div>
+{% block role_specific_links %}
+    <div>
+        <ul class="main-menu">
+            <li><i class="fa-solid fa-people-group"></i>Thông tin
+                <ul class="child-menu">
+                    <li><a href="{% url 'admin_teacher_infor' %}" class="nav-item">Thông tin giảng viên</a></li>
+                    <li><a href="{% url 'admin_student_infor' %}" class="nav-item">Thông tin sinh viên</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>  
+    <a href="{% url 'event_management' %}" class="nav-item"><i class="fas fa-calendar-check"></i> Quản lý Sự kiện</a>             
+{% endblock role_specific_links %}
 
-            <div class="child-main-content">    
-                <!-- 
-                =========================================
-                ======== PHẦN NỘI DUNG Ở GIỮA ===========
-                =========================================
-                -->
-                <div class="classes-list">
+{% block user_info %}
+    <div class="get-username" data-student="{{studentId}}" data-role="{{ user_role }}">
+        Xin chào, {{ username }}<br> 
+        <span style="font-size: 16px;">Admin</span>
+    </div>
+{% endblock user_info %}
 
-                    <section class="week-view">
-                        <h4>Thời khóa biểu</h4>
-                        <ul class="week-days"></ul>
-                    </section>
+{% block content %}
+    <div class="classes-list">
+        <section class="week-view">
+            <h4>Thời khóa biểu</h4>
+            <ul class="week-days"></ul>
+        </section>
 
-                    <div class="admin-event-panel">
-                        <h3>Gửi thông báo sự kiện</h3>
-                        <form id="event-form">
-                            {% csrf_token %}
-                            <input type="text" id="event-title" placeholder="Tên sự kiện" required>
-                            <input type="datetime-local" id="event-time" required>
-                            <select id="event-receiver">
-                                <option value="ALL">Tất cả</option>
-                                <option value="STUDENT">Sinh viên</option>
-                                <option value="TEACHER">Giảng viên</option>
-                            </select>
-                            <button type="submit">Gửi thông báo</button>
-                        </form>
-                    </div>
-                </div>
-                <!-- 
-                =========================================
-                ======== PHẦN NỘI DUNG BÊN PHẢI =========
-                =========================================
-                -->
-                <div class="child-main-content-right">
-                    <div class="calendar-widget">
-                        <div class="calendar">
-                            <h1>Calendar</h1>
-                            <header>
-                                <h3></h3>
-                                <nav>
-                                    <button id="prev"></button>
-                                    <button id="next"></button>
-                                </nav>
-                            </header>
-                            <section>
-                                <ul class="days">
-                                    <li>Sun</li>
-                                    <li>Mon</li>
-                                    <li>Tue</li>
-                                    <li>Wed</li>
-                                    <li>Thu</li>
-                                    <li>Fri</li>
-                                    <li>Sat</li>
-                                </ul>
-                                <ul class="dates"></ul>
-                            </section>
-                        </div>
-                    </div>
-                </div>            
-            </div>     
+        <div class="admin-event-panel">
+            <h3>Gửi thông báo sự kiện</h3>
+            <form id="event-form">
+                {% csrf_token %}
+                <input type="text" id="event-title" placeholder="Tên sự kiện" required>
+                <input type="datetime-local" id="event-time" required>
+                <select id="event-receiver">
+                    <option value="ALL">Tất cả</option>
+                    <option value="STUDENT">Sinh viên</option>
+                    <option value="TEACHER">Giảng viên</option>
+                </select>
+                <button type="submit">Gửi thông báo</button>
+            </form>
         </div>
     </div>
 
+    <div class="child-main-content-right">
+        <div class="calendar-widget">
+            <div class="calendar">
+                <h1>Calendar</h1>
+                <header>
+                    <h3></h3>
+                    <nav>
+                        <button id="prev"></button>
+                        <button id="next"></button>
+                    </nav>
+                </header>
+                <section>
+                    <ul class="days">
+                        <li>Sun</li>
+                        <li>Mon</li>
+                        <li>Tue</li>
+                        <li>Wed</li>
+                        <li>Thu</li>
+                        <li>Fri</li>
+                        <li>Sat</li>
+                    </ul>
+                    <ul class="dates"></ul>
+                </section>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block scripts %}
     <script src="{% static 'style/admin_api.js' %}"></script>
-    <script src="../static/style/calendar.js"></script>
-</body>
-</html>
+{% endblock scripts %}
