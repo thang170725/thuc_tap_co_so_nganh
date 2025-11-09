@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, FileResponse
 from django.template import loader
 from django.db import connection
 from collections import defaultdict
@@ -10,6 +10,15 @@ from django.utils import timezone
 import json
 from django.utils.dateparse import parse_datetime
 from django.views.decorators.csrf import csrf_exempt
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+import matplotlib.font_manager as fm
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
+import io
+import requests
 '''
 ==============================================================
 =================== VIEWS LOGIN CHUYÊN ROLE ==================
@@ -610,3 +619,73 @@ def admin_teacher_infor(request):
 def admin_student_infor(request):
     return render(request, 'admin_student_infor.html')
 
+def export_timetable_pdf(request):
+    """Xuất thời khóa biểu giảng viên ra PDF"""
+    user_id = request.session.get("userId")
+    if not user_id:
+        return JsonResponse({"error": "Bạn chưa đăng nhập"}, status=401)
+
+    # --- Lấy dữ liệu thời khóa biểu ---
+    data = fetch_timetable_teacher(user_id)  # Hàm của bạn
+
+    # --- Buffer PDF ---
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+
+    # --- Đăng ký font Unicode ---
+    font_path = fm.findfont("DejaVu Sans")  # Ubuntu thường có sẵn
+    pdfmetrics.registerFont(TTFont('DejaVuSans', font_path))
+
+    # --- Style ---
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('title', parent=styles['Heading1'],
+                                 fontName='DejaVuSans', alignment=TA_CENTER,
+                                 fontSize=18, leading=22)
+    day_style = ParagraphStyle('day', parent=styles['Heading2'],
+                               fontName='DejaVuSans', fontSize=14,
+                               spaceBefore=10, spaceAfter=5)
+    text_style = ParagraphStyle('text', parent=styles['Normal'],
+                                fontName='DejaVuSans', fontSize=12,
+                                leading=16, alignment=TA_LEFT)
+
+    # --- Nội dung PDF ---
+    story = []
+    story.append(Paragraph("THỜI KHÓA BIỂU GIẢNG VIÊN", title_style))
+    story.append(Spacer(1, 12))
+
+    for day, classes in data.items():
+        story.append(Paragraph(f"📅 {day}", day_style))
+        if not classes:
+            story.append(Paragraph("Không có lớp", text_style))
+            story.append(Spacer(1, 6))
+            continue
+
+        for c in classes:
+            line = f"- {c['courseName']} ({c['start']} - {c['end']}) | Phòng: {c['room']} | Sĩ số: {c['capacity']}"
+            story.append(Paragraph(line, text_style))
+        story.append(Spacer(1, 8))
+
+    # --- Build PDF ---
+    doc.build(story)
+    buffer.seek(0)
+    filename = f"timetable_{user_id}.pdf"
+    return FileResponse(buffer, as_attachment=True, filename=filename, content_type='application/pdf')
+
+def api_weather(request):
+    city = request.GET.get("city", "Hà Nội")
+    API_KEY = "a3502bbb398c639df116db612b1cdf2a"
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={city},vn&appid={API_KEY}&units=metric&lang=vi"
+    
+    response = requests.get(url)
+    if response.status_code != 200:
+        return JsonResponse({"error": "Không thể lấy dữ liệu thời tiết"}, status=500)
+    
+    data = response.json()
+    result = {
+        "temp": data["main"]["temp"],
+        "desc": data["weather"][0]["description"],
+        "humidity": data["main"]["humidity"],
+        "city": city,
+        "icon": data["weather"][0]["icon"]  # icon OpenWeather
+    }
+    return JsonResponse(result)

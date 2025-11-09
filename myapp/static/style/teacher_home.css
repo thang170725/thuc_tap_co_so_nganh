@@ -53,3 +53,139 @@
     display: block;
     width: 80%;
 }
+
+/* overlay modal */
+.modal {
+    display: none; /* ẩn mặc định */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+/* modal content */
+.modal-content {
+    background: #fff;
+    margin: 5% auto;
+    padding: 30px 25px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    position: relative;
+    animation: slideDown 0.3s ease;
+}
+
+/* close button */
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1E3A8A;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close:hover {
+    color: #2563EB;
+}
+
+/* heading */
+.modal-content h4 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #1E3A8A;
+}
+
+/* form fields */
+.modal-content form .title,
+.modal-content form .content {
+    margin-bottom: 15px;
+}
+
+.modal-content form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #1E3A8A;
+}
+
+.modal-content form input,
+.modal-content form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.modal-content form input:focus,
+.modal-content form textarea:focus {
+    border-color: #1E3A8A;
+    box-shadow: 0 0 8px rgba(30, 58, 138, 0.3);
+    outline: none;
+}
+
+/* textarea height */
+.modal-content form textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* submit button */
+.modal-content form .signin {
+    width: 100%;
+    padding: 12px 0;
+    margin-top: 10px;
+    background: #1E3A8A;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.modal-content form .signin:hover {
+    background: #2563EB;
+}
+
+/* message */
+.modal-content #msg {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/* animations */
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+@keyframes slideDown {
+    from {transform: translateY(-20px); opacity: 0;}
+    to {transform: translateY(0); opacity: 1;}
+}
+
+/* responsive */
+@media (max-width: 500px) {
+    .modal-content {
+        padding: 20px;
+    }
+    .modal-content h4 {
+        font-size: 20px;
+    }
+    .modal-content form .signin {
+        font-size: 14px;
+    }
+}

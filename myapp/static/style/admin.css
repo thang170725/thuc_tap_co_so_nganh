@@ -79,29 +79,163 @@ ul {
 ========== STYLE PHẦN XEM THÔNG TIN GIẢNH VIÊN THEO KHOA============
 ====================================================================
 */
-.teacher-infor{
-    width: 90%;
-    border-radius: 20px;
-    border: 1px solid var(--class-border);
-    margin: 5%;
+/* ==== Modal popup ==== */
+.teacher-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 32, 64, 0.8);
+  backdrop-filter: blur(3px);
 }
-.teacher-infor-title{
-    padding: 15px 10px;
+
+/* ==== Nội dung bảng nổi ==== */
+.teacher-modal-content {
+  background-color: #003366;
+  margin: 8% auto;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 550px;
+  color: #fff;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==== Nút đóng ==== */
+.close-btn {
+  float: right;
+  color: #00bfff;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+.close-btn:hover { color: #fff; }
+
+/* ==== Form trong modal ==== */
+#search-department-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+#search-department-form input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #0066cc;
+}
+#search-department-form button {
+  background-color: #00bfff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: bold;
+}
+#search-department-form button:hover {
+  background-color: #0099e6;
+}
+
+/* ==== Bảng dữ liệu ==== */
+.teacher-course-content table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.teacher-course-content th {
+  background-color: #0059b3;
+  color: white;
+  padding: 10px;
+  border: 1px solid #004080;
+}
+.teacher-course-content td {
+  background-color: #003366;
+  color: #e0f0ff;
+  border: 1px solid #004080;
+  padding: 8px;
+}
+.teacher-course-content tr:hover td {
+  background-color: #004c99;
+}
+/* 
+====================================================================
+========== THÔNG BÁO SỰ KIỆN =======================================
+====================================================================
+*/
+/* Container tổng thể */
+.admin-event-panel {
+    width: 95%;
+    background-color: #003366; /* xanh nước biển đậm */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    margin: 20px auto;
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Tiêu đề */
+.admin-event-panel h3 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-align: center;
+    color: #00bfff; /* xanh sáng nổi bật */
+}
+
+/* Form */
+.admin-event-panel form {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 15px;
 }
-.teacher-source-content{
-    width: 90%;
-    height: 500px;
-    border: 1px solid var(--class-text);
-    margin: 1% 5%;
+
+/* Input và select */
+.admin-event-panel input,
+.admin-event-panel select {
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    outline: none;
+    transition: box-shadow 0.2s, transform 0.2s;
 }
-.student-infor-title{
-    display: flex;
-    justify-content: space-between;
+
+/* Input focus */
+.admin-event-panel input:focus,
+.admin-event-panel select:focus {
+    box-shadow: 0 0 5px 2px #00bfff;
+    transform: translateY(-2px);
 }
-.student-infor-title form{
-    display: flex;
-    align-items: center;
-    padding: 5px 10px;
+
+/* Placeholder */
+.admin-event-panel input::placeholder {
+    color: #cce6ff;
+}
+
+/* Button */
+.admin-event-panel button {
+    padding: 12px;
+    background-color: #00bfff;
+    color: #003366;
+    font-weight: bold;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+}
+
+/* Hover button */
+.admin-event-panel button:hover {
+    background-color: #0099cc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }

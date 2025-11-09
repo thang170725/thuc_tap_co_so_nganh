@@ -5,6 +5,7 @@
 
 {% block page_css %}
     <link rel="stylesheet" href="{% static 'style/student_home.css' %}">
+    <link rel="stylesheet" href="{% static 'style/general.css' %}">
 {% endblock %}
 
 {% block timetable_active %}active{% endblock %}
@@ -19,11 +20,12 @@
     </div>
 {% endblock user_info %}
 
-{% block content %}
+{% block content %}  
     <div class="classes-list">
+        <h4>Thời khóa biểu</h4>
         <section class="week-view">
-            <h4>Thời khóa biểu</h4>
             <ul class="week-days"></ul>
+            <div id="weather-container"></div>
         </section>
         <div id="timetable-container"></div>
     </div>

@@ -5,9 +5,41 @@
 
 {% block page_css %}
     <link rel="stylesheet" href="{% static 'style/teacher_home.css' %}">
+    <link rel="stylesheet" href="{% static 'style/general.css' %}">
 {% endblock %}
 
 {% block timetable_active %}active{% endblock %}
+
+{% block add_sidebar %}
+    <a href="#" class="nav-item" id="send-ann-btn">
+        <i class="fa-solid fa-share-from-square"></i>Gửi thông báo
+    </a>
+
+    <!-- Modal container -->
+    <div id="announcement-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h4>Gửi thông báo</h4>
+            <form id="announcement-form" method="post">
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                <div class="title">
+                    <label>Mã Môn:</label>
+                    <input type="text" name="courseId" required>
+                </div>
+                <div class="title">
+                    <label>Tiêu đề:</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="content">
+                    <label>Nội dung:</label>
+                    <textarea name="content" required></textarea>
+                </div>
+                <button type="submit" class="signin">Gửi</button>
+            </form>
+            <p id="msg" style="color: green;"></p>
+        </div>
+    </div>
+{% endblock add_sidebar %}
 
 {% block role_specific_links %}
 {% endblock role_specific_links %}
@@ -21,12 +53,17 @@
 
 {% block content %}
     <div class="classes-list">
-        <section class="week-view">
-            <h4>Thời khóa biểu</h4>
+        <h4>Thời khóa biểu</h4>
+
+        <section class="week-view">               
             <ul class="week-days"></ul>
+            <div id="weather-container"></div>
         </section>
 
-        <div id="timetable-container"></div>
+        <div>
+            <button id="export-btn">📄 Xuất PDF</button>
+            <div id="timetable-container"></div>
+        </div>   
     </div>
 
     <div class="child-main-content-right">
@@ -60,7 +97,7 @@
             <div class="event-container"></div>
         </div>     
         
-        <div class="send-announcement">
+        {% comment %} <div class="send-announcement">
             <h4>Gửi thông báo</h4>
             <form id="announcement-form" method="post">     
                 {% csrf_token %}
@@ -79,10 +116,11 @@
                 <button type="submit" class="signin">Gửi</button>
             </form>
             <p id="msg" style="color: green;"></p>
-        </div>                
+        </div>                 {% endcomment %}
     </div>
 {% endblock content %}
 
 {% block scripts %}
     <script src="{% static 'style/teacher_home_api.js'%}"></script>
+    <script src="{% static 'style/general.js'%}"></script>
 {% endblock scripts %}

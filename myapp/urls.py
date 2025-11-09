@@ -5,6 +5,9 @@ urlpatterns = [
     path('', views.login_view, name='login'),
     path("student_home/", views.student_home, name="student_home"),
     path("teacher_home/", views.teacher_home, name="teacher_home"),
+    # đường dẫn trang giảng viên
+    path("api/export_timetable/", views.export_timetable_pdf, name="export_timetable"),
+    path("api/weather/", views.api_weather, name="api_weather"),
     path("api/timetable/", views.timetable_api, name="timetable_api"),
     path("api/timetable_teacher/", views.timetable_teacher_api, name="timetable_teacher_api"),
     path('api/announcements/', views.announcements_api, name='announcements_api'),
