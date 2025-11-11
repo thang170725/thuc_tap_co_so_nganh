@@ -1,0 +1,110 @@
+_{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quản lý Người dùng{% endblock title %}
+
+<!-- 1. Chèn CSS (nếu cần) -->
+{% block page_css %}
+<style>
+    .filter-bar { margin: 20px 0; }
+    .filter-bar a {
+        padding: 8px 12px;
+        text-decoration: none;
+        background-color: #f0f0f0;
+        color: #555;
+        border-radius: 5px;
+        margin-right: 5px;
+    }
+    .filter-bar a.active, .filter-bar a:hover {
+        background-color: #007bff;
+        color: white;
+    }
+    .table th, .table td { vertical-align: middle; }
+</style>
+{% endblock %}
+
+<!-- 2. Lấp đầy sidebar của Admin -->
+{% block role_specific_links %}
+    <div>
+        <ul class="main-menu">
+            <li><i class="fa-solid fa-people-group"></i>Thông tin
+                <ul class="child-menu">
+                    <li><a href="{% url 'admin_teacher_infor' %}" class="nav-item">Thông tin giảng viên</a></li>
+                    <li><a href="{% url 'admin_student_infor' %}" class="nav-item">Thông tin sinh viên</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>  
+    <a href="{% url 'event_management' %}" class="nav-item"><i class="fas fa-calendar-check"></i> Quản lý Sự kiện</a>
+    <!-- Thêm link Quản lý User và đánh dấu active -->
+    <a href="{% url 'user_list' %}" class="nav-item active"><i class="fas fa-users-cog"></i> Quản lý Người dùng</a>
+{% endblock role_specific_links %}
+
+<!-- 3. Chèn thông tin User Admin -->
+{% block user_info %}
+    <div class="get-username">
+        Xin chào, {{ user_profile.userId }}<br> 
+        <span style="font-size: 16px;">Admin</span>
+    </div>
+{% endblock user_info %}
+
+<!-- 4. Nội dung chính -->
+{% block content %}
+<div style="padding: 20px; background-color: white; margin: 20px; border-radius: 8px;">
+    
+    <h2 style="border-bottom: 2px solid #eee; padding-bottom: 10px;">Quản lý Người dùng</h2>
+    
+    <p style="margin-top: 20px;">
+        <a href="{% url 'user_create' %}" style="text-decoration: none; padding: 10px 15px; background-color: #28a745; color: white; border-radius: 5px; font-weight: bold;">
+            + Thêm Người dùng mới
+        </a>
+    </p>
+
+    <!-- (Hiển thị messages (nếu có)) -->
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding: 15px; margin: 20px 0; border-radius: 5px; background-color: {% if message.tags == 'success' %}#d4edda{% else %}#f8d7da{% endif %}; color: {% if message.tags == 'success' %}#155724{% else %}#721c24{% endif %}; border: 1px solid {% if message.tags == 'success' %}#c3e6cb{% else %}#f5c6cb{% endif %};">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Thanh Filter -->
+    <div class="filter-bar">
+        <strong>Lọc theo:</strong>
+        <a href="{% url 'user_list' %}" class="{% if not request.GET.role %}active{% endif %}">Tất cả</a>
+        <a href="?role=admin" class="{% if request.GET.role == 'admin' %}active{% endif %}">Admin</a>
+        <a href="?role=teacher" class="{% if request.GET.role == 'teacher' %}active{% endif %}">Giảng viên</a>
+        <a href="?role=student" class="{% if request.GET.role == 'student' %}active{% endif %}">Sinh viên</a>
+    </div>
+
+    <!-- Bảng danh sách User -->
+    <table class="table table-striped" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+            <tr style="background-color: #f8f9fa;">
+                <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">UserID (Tên ĐN)</th>
+                <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Email</th>
+                <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Vai trò</th>
+                <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in user_list %}
+            <tr>
+                <td style="padding: 12px; border: 1px solid #ddd;">{{ user.userId }}</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">{{ user.email }}</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">{{ user.get_role_display }}</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">
+                    <a href="{% url 'user_edit' user.userId %}" style="color: #ffc107; text-decoration: none; font-weight: bold;">Sửa</a>
+                    <a href="{% url 'user_delete' user.userId %}" style="color: #dc3545; text-decoration: none; margin-left: 15px; font-weight: bold;">Xóa</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="padding: 12px; border: 1px solid #ddd; text-align: center;">Không có người dùng nào.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}
