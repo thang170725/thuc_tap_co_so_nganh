@@ -192,21 +192,39 @@ def fetch_username(user_id):
     row = cursor.fetchone()
   return row[0] if row else None
 # hàm lấy ra thời khóa biểu đưa lên trang sinh viên
+# --- THAY THẾ TOÀN BỘ HÀM NÀY ---
+#
+# hàm lấy ra thời khóa biểu đưa lên trang sinh viên
 def fetch_timetable(user_id):
   with connection.cursor() as cursor:
+    
+    # --- ĐÂY LÀ CÂU SQL ĐÃ SỬA LỖI ---
+    # (Nó sẽ tìm TKB dựa trên Lớp học (Classes)
+    # thay vì Môn học (Courses) như code cũ)
     cursor.execute("""
-      SELECT c.courseId, c.courseName, t.fullName, sch.startTime, sch.endTime, sch.dayOfWeek, r.roomId
+      SELECT 
+          c.courseId, 
+          c.courseName, 
+          t.fullName, 
+          sch.startTime, 
+          sch.endTime, 
+          sch.dayOfWeek, 
+          r.roomId
       FROM Students s
-      JOIN Students_Courses sc ON s.studentId = sc.studentId
-      JOIN Courses c ON sc.courseId = c.courseId
-      JOIN Teachers t ON c.teacherId = t.teacherId
-      JOIN Schedules sch ON c.courseId = sch.courseId
-      JOIN Rooms r ON sch.roomId = r.roomId
-      where s.studentId = %s
-      ORDER BY s.studentId;
+      JOIN Students_Classes sc ON s.studentId = sc.studentId   -- (Từ SV -> Bảng 11)
+      JOIN Classes cl ON sc.classId = cl.classId               -- (Bảng 11 -> Bảng 10 (Lớp))
+      JOIN Schedules sch ON cl.classId = sch.classId           -- (Bảng 10 -> Bảng 9 (Lịch)) <-- SỬA LỖI Ở ĐÂY
+      JOIN Courses c ON cl.courseId = c.courseId               -- (Bảng 10 -> Bảng 6 (Môn))
+      JOIN Teachers t ON cl.teacherId = t.teacherId             -- (Bảng 10 -> Bảng 4 (GV))
+      JOIN Rooms r ON sch.roomId = r.roomId                   -- (Bảng 9 -> Bảng 8 (Phòng))
+      WHERE s.studentId = %s
+      ORDER BY sch.startTime;
     """, [user_id])
+    # --- KẾT THÚC CÂU SQL ĐÃ SỬA ---
+    
     rows = cursor.fetchall()
-  # gom nhóm theo thứ
+    
+  # (Phần code gom nhóm bên dưới đã đúng, giữ nguyên)
   timetable = defaultdict(list)
   for courseId, courseName, teacherName, startTime, endTime, dayOfWeek, roomId in rows:
     timetable[dayOfWeek].append({
@@ -220,6 +238,9 @@ def fetch_timetable(user_id):
   # Tạo khung 7 ngày (Mon → Sun)
   days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
   return {day: timetable.get(day, []) for day in days}
+#
+# --- KẾT THÚC HÀM CẦN THAY THẾ ---
+#
 # =================== HÀM GỬI RESPONSE ĐẾN TRANG SINH VIÊN ===================
 
 # hàm lấy chi tiết môn học đưa lên giao diện

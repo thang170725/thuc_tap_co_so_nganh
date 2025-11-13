@@ -120,20 +120,27 @@ class Rooms(models.Model):
         managed = False
         db_table = 'Rooms'
 
-## 8. Bảng Schedules (Bảng 9)
+# myapp/models.py
+
+## 8. Bảng Schedules (Bảng 9) - (ĐÃ SỬA LỖI LOGIC)
 class Schedules(models.Model):
-    # SỬA LỖI: Đã xóa `blank=True`.
-    # SỬA TÊN: Đổi `scheduleid` thành `scheduleId` cho nhất quán
     scheduleId = models.CharField(max_length=20, primary_key=True)
-    courseId = models.ForeignKey(
-        Courses,
-        on_delete=models.CASCADE,
-        db_column='courseId',         
+    
+    # --- ĐÂY LÀ THAY ĐỔI QUAN TRỌNG ---
+    # Nó phải liên kết với Bảng 10 (Classes), KHÔNG PHẢI Bảng 6 (Courses)
+    classId = models.ForeignKey(
+        'Classes', 
+        on_delete=models.CASCADE, 
+        db_column='classId',
+        related_name='schedules' # Thêm related_name để query ngược
     )
+    # -----------------------------------
+    
     roomId = models.ForeignKey(
         Rooms,
         on_delete=models.CASCADE,
-        db_column='roomId',         
+        db_column='roomId',
+        related_name='schedules' # Thêm related_name
     )
     startTime = models.TimeField()
     endTime = models.TimeField()
@@ -144,7 +151,7 @@ class Schedules(models.Model):
         ('Thu', 'Thu'),
         ('Fri', 'Fri'),
         ('Sat', 'Sat'),
-        ('Sun', 'Sun') # SỬA TYPO: 'Sum' thành 'Sun'
+        ('Sun', 'Sun') 
     ]
     dayOfWeek = models.CharField(
         max_length=20, 
@@ -152,12 +159,11 @@ class Schedules(models.Model):
         blank=True, 
         null=True
     )
-    weekNumber = models.IntegerField()
+    weekNumber = models.IntegerField(default=1) # (Thêm default=1)
     
     class Meta:
         managed = False
         db_table = 'Schedules'
-
 ## 9. Bảng Classes (Bảng 10)
 class Classes(models.Model):
     classId = models.CharField(primary_key=True, max_length=20)
@@ -172,7 +178,11 @@ class Classes(models.Model):
         db_column='teacherId'
     )
     semester = models.CharField(max_length=20, blank=True, null=True) # Thêm blank/null
-
+    students = models.ManyToManyField(
+        Students,
+        through='Students_Classes', # Tên model của bảng trung gian
+        related_name='joined_classes'
+    )
     class Meta:
         managed = False
         db_table = 'Classes'

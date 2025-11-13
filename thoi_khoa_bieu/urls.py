@@ -11,6 +11,7 @@ urlpatterns = [
     path('admin/users/', include('user_manager.urls')), 
     path('admin/events/', include('event_admin.urls')),
     path('admin/academics/', include('academic_manager.urls')),
+    path('admin/scheduling/', include('schedule_manager.urls')),
     path('admin/', admin.site.urls),
     
     # Kích hoạt các link 'logout', 'password_change'

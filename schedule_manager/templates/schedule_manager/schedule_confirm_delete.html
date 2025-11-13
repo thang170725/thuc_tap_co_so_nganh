@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Xác nhận Xóa Môn học{% endblock title %}
+{% block title %}Xác nhận Xóa Lịch học{% endblock title %}
 
 <!-- 1. Lấp đầy sidebar của Admin -->
 {% block role_specific_links %}
@@ -17,9 +17,9 @@
     </div>  
     <a href="{% url 'event_management' %}" class="nav-item"><i class="fas fa-calendar-check"></i> Quản lý Sự kiện</a>
     <a href="{% url 'user_list' %}" class="nav-item"><i class="fas fa-users-cog"></i> Quản lý Người dùng</a>
-    <!-- Đánh dấu active cho link Quản lý Học vụ -->
-    <a href="{% url 'course_list' %}" class="nav-item active"><i class="fas fa-book-open"></i> Quản lý Học vụ</a>
-    <a href="{% url 'room_list' %}" class="nav-item"><i class="fas fa-calendar-alt"></i> Quản lý Xếp lịch</a>
+    <a href="{% url 'course_list' %}" class="nav-item"><i class="fas fa-book-open"></i> Quản lý Học vụ</a>
+    <!-- Đánh dấu active cho link Quản lý Xếp lịch -->
+    <a href="{% url 'room_list' %}" class="nav-item active"><i class="fas fa-calendar-alt"></i> Quản lý Xếp lịch</a>
 {% endblock role_specific_links %}
 
 <!-- 2. Chèn thông tin User Admin -->
@@ -34,23 +34,22 @@
 {% block content %}
 <div style="padding: 20px; background-color: white; margin: 20px; border-radius: 8px;">
     
-    <h2 style="border-bottom: 2px solid #eee; padding-bottom: 10px;">Xác nhận Xóa Môn học</h2>
+    <h2 style="border-bottom: 2px solid #eee; padding-bottom: 10px;">Xác nhận Xóa Lịch học</h2>
     <hr>
 
-    <p style="font-size: 1.1em;">Bạn có chắc chắn muốn xóa môn học sau không?</p>
-    <h3 style="color: #dc3545;">{{ course_to_delete.courseName }} ({{ course_to_delete.courseId }})</h3>
-    <p><strong>Giảng viên:</strong> {{ course_to_delete.teacherId.fullName }}</p>
-    <p style="font-weight: bold; color: #721c24;">
-        Hành động này sẽ thất bại nếu Môn học này đang được
-        sử dụng bởi bất kỳ Lớp học (Classes) hoặc Lịch học (Schedules) nào.
-    </p>
+    <p style="font-size: 1.1em;">Bạn có chắc chắn muốn xóa lịch học sau không?</p>
+    <h3 style="color: #dc3545;">Lịch: {{ schedule_to_delete.scheduleId }}</h3>
+    <p><strong>Lớp:</strong> {{ schedule_to_delete.classId.classId }}</p>
+    <p><strong>Môn học:</strong> {{ schedule_to_delete.classId.courseId.courseName }}</p>
+    <p><strong>Thời gian:</strong> {{ schedule_to_delete.get_dayOfWeek_display }}, {{ schedule_to_delete.startTime }} - {{ schedule_to_delete.endTime }}</p>
+    <p><strong>Phòng:</strong> {{ schedule_to_delete.roomId.roomNumber }}</p>
 
     <form method="POST" style="margin-top: 20px;">
         {% csrf_token %}
         <button type="submit" style="padding: 10px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
             Vẫn Xóa
         </button>
-        <a href="{% url 'course_list' %}" style="padding: 10px 15px; background-color: #6c757d; color: white; border: none; border-radius: 5px; text-decoration: none; margin-left: 10px; font-size: 16px;">
+        <a href="{% url 'schedule_list' %}" style="padding: 10px 15px; background-color: #6c757d; color: white; border: none; border-radius: 5px; text-decoration: none; margin-left: 10px; font-size: 16px;">
             Hủy bỏ
         </a>
     </form>

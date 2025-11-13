@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'event_admin',
     'user_manager',
     'academic_manager',
+    'schedule_manager',
 ]
 
 MIDDLEWARE = [

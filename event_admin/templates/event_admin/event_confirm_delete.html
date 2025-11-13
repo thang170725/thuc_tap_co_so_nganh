@@ -13,7 +13,8 @@
     </div>  
     <a href="{% url 'event_management' %}" class="nav-item active"><i class="fas fa-calendar-check"></i> Quản lý Sự kiện</a>
     <a href="{% url 'user_list' %}" class="nav-item"><i class="fas fa-users-cog"></i> Quản lý Người dùng</a>
-    <a href="{% url 'course_list' %}" class="nav-item"><i class="fas fa-book-open"></i> Quản lý Học vụ</a>    
+    <a href="{% url 'course_list' %}" class="nav-item"><i class="fas fa-book-open"></i> Quản lý Học vụ</a>   
+    <a href="{% url 'room_list' %}" class="nav-item"><i class="fas fa-calendar-alt"></i> Quản lý Xếp lịch</a> 
 {% endblock role_specific_links %}
 
 {% block title %}Xác nhận xóa{% endblock title %}

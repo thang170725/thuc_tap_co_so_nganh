@@ -37,6 +37,7 @@
     <a href="{% url 'user_list' %}" class="nav-item"><i class="fas fa-users-cog"></i> Quản lý Người dùng</a>
     <!-- Đánh dấu active cho link Quản lý Học vụ -->
     <a href="{% url 'course_list' %}" class="nav-item active"><i class="fas fa-book-open"></i> Quản lý Học vụ</a>
+    <a href="{% url 'room_list' %}" class="nav-item"><i class="fas fa-calendar-alt"></i> Quản lý Xếp lịch</a>
 {% endblock role_specific_links %}
 
 <!-- 3. Chèn thông tin User Admin -->
@@ -55,8 +56,8 @@
 
     <!-- Thanh Tab Navigation (Môn học / Lớp học) -->
     <div class="sub-nav">
-        <a href="{% url 'course_list' %}">Phần A: Quản lý Môn học</a>
-        <a href="{% url 'class_list' %}" class="active">Phần B: Quản lý Lớp học</a>
+        <a href="{% url 'course_list' %}">Quản lý Môn học</a>
+        <a href="{% url 'class_list' %}" class="active">Quản lý Lớp học</a>
         <!-- (Link Phần C sẽ thêm vào đây sau) -->
     </div>
     
