@@ -1,5 +1,21 @@
 {% extends 'base.html' %}
 
+{% block role_specific_links %}
+    <div>
+        <ul class="main-menu">
+            <li><i class="fa-solid fa-people-group"></i>Thông tin
+                <ul class="child-menu">
+                    <li><a href="{% url 'admin_teacher_infor' %}" class="nav-item">Thông tin giảng viên</a></li>
+                    <li><a href="{% url 'admin_student_infor' %}" class="nav-item">Thông tin sinh viên</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>  
+    <a href="{% url 'event_management' %}" class="nav-item active"><i class="fas fa-calendar-check"></i> Quản lý Sự kiện</a>
+    <a href="{% url 'user_list' %}" class="nav-item"><i class="fas fa-users-cog"></i> Quản lý Người dùng</a>
+    <a href="{% url 'course_list' %}" class="nav-item"><i class="fas fa-book-open"></i> Quản lý Học vụ</a>    
+{% endblock role_specific_links %}
+
 {% block title %}Xác nhận xóa{% endblock title %}
 
 {% block content %}
