@@ -333,7 +333,8 @@ def fetch_timetable_teacher(user_id):
       SELECT c.courseId, c.courseName, sch.startTime, sch.endTime, sch.dayOfWeek, r.roomId, r.capacity
       FROM Teachers t
       JOIN Courses c ON t.teacherId = c.teacherId
-      JOIN Schedules sch ON c.courseId = sch.courseId
+      join Classes cl on c.courseId = cl.courseId
+      JOIN Schedules sch ON cl.classId = sch.ClassId
       JOIN Rooms r ON sch.roomId = r.roomId
       where t.teacherId = %s
       ORDER BY t.teacherId;
@@ -440,7 +441,8 @@ def api_reminders(request):
             FROM Students s
             JOIN Students_Courses sc ON s.studentId = sc.studentId
             JOIN Courses c ON sc.courseId = c.courseId
-            JOIN Schedules sch ON c.courseId = sch.courseId
+            join Classes cl on c.courseId = cl.courseId
+            JOIN Schedules sch ON cl.classId = sch.classId
             JOIN Rooms r ON sch.roomId = r.roomId
             WHERE s.studentId = %s
         """, [student_id])
