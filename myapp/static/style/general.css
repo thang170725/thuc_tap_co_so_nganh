@@ -481,7 +481,6 @@
     border: 1px solid var(--class-border);
     border-radius: 20px;
     margin-left: 5%;
-    height: 200px;
 }
 
 .upcoming-events h3 {
@@ -513,4 +512,80 @@
 
 .event-details small {
     color: var(--text-light);
+}
+
+/*
+========================================================= 
+============= CSS CHATBOT ===============================
+=========================================================
+*/
+#ai-chat-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    font-size: 40px;
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid var(--class-bg-calendar);
+    border-radius: 20px;
+}
+
+#ai-chat-icon:hover{
+    background-color: #e06e11;
+    transition: all 1s;
+    border: none;
+}
+
+#ai-chat-popup {
+    display: none;
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    width: 400px;
+    height: 400px;
+    background: hsl(210, 100%, 31%);
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+#ai-chat-header {
+    background: #003366;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+#ai-chat-body {
+    padding: 10px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+#ai-chat-body p {
+    margin: 5px 0;
+}
+
+#ai-chat-form {
+    display: flex;
+    border-top: 1px solid #004080;
+}
+
+#ai-chat-form input {
+    flex: 1;
+    padding: 5px;
+    border: none;
+    outline: none;
+}
+
+#ai-chat-form button {
+    background: #004080;
+    border: none;
+    color: #fff;
+    padding: 0 10px;
+    cursor: pointer;
 }

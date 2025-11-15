@@ -28,6 +28,23 @@
             <div id="weather-container"></div>
         </section>
         <div id="timetable-container"></div>
+
+        <!-- Robot Icon -->
+        <div id="ai-chat-icon">🤖</div>
+
+        <!-- Chat popup -->
+        <div id="ai-chat-popup">
+            <div id="ai-chat-header">
+                <span>AI Chat</span>
+                <button id="ai-chat-close">&times;</button>
+            </div>
+            <div id="ai-chat-body"></div>
+            <form id="ai-chat-form">
+                <input type="text" id="ai-chat-input" placeholder="Nhập câu hỏi..." required maxlength="100">
+                <button type="submit">Gửi</button>
+            </form>
+        </div>
+
     </div>
 
     <div class="child-main-content-right">
@@ -65,4 +82,5 @@
 {% block scripts %}
     <script src="{% static 'style/student_home_api.js' %}"></script>
     <script src="{% static 'style/general_student.js' %}"></script>
+    <script src="{% static 'style/chat.js' %}"></script>
 {% endblock scripts %}

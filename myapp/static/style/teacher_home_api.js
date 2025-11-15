@@ -47,18 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// document.getElementById("announcement-form").addEventListener("submit", async (e) => {
-//   e.preventDefault();
-
-//   const formData = new FormData(e.target);
-//   const response = await fetch("/api/send_announcement/", {
-//     method: "POST",
-//     body: formData,
-//   });
-
-//   const data = await response.json();
-//   document.getElementById("msg").innerText = data.message || data.error;
-// });
 /*
 ==================================================================
 ====== GỌI API VÀ HIỂN THỊ THỜI KHÓA BIỂU CỦA GIẢNG VIÊN =========

@@ -356,24 +356,29 @@ def fetch_timetable_teacher(user_id):
   days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
   return {day: timetable.get(day, []) for day in days}
 
+'''
+==============================================================
+========== GỬI THÔNG BÁO TỪ GIẢNG VIỆN TỚI HỌC SINH ==========
+==============================================================
+'''
 def send_announcement(request): # gửi thông báo từ giảng viên tới học sinh
     if request.method != "POST":
         return JsonResponse({"error": "Chỉ hỗ trợ POST"}, status=405)
 
     sender_id = request.session.get("userId")
-    course_id = request.POST.get("courseId")
+    class_id = request.POST.get("classId")
     title = request.POST.get("title")
     content = request.POST.get("content")
 
-    if not all([course_id, title, content]):
+    if not all([class_id, title, content]):
         return JsonResponse({"error": "Thiếu dữ liệu cần thiết"}, status=400)
 
     try:
         with connection.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO Announcements (senderId, courseId, title, content, createdAt)
+                INSERT INTO Announcements (senderId, classId, title, content, createdAt)
                 VALUES (%s, %s, %s, %s, %s)
-            """, [sender_id, course_id, title, content, timezone.now()])
+            """, [sender_id, class_id, title, content, timezone.now()])
 
         return JsonResponse({"message": "Đã gửi thông báo thành công!"})
     except Exception as e:
@@ -401,7 +406,11 @@ def teacher_home(request):
   }
   return render(request, "teacher_home.html", context)
 
-# ================================================ API trả danh sách thông báo ================================================ 
+'''
+==============================================================
+======== XEM THÔNG BÁO =======================================
+==============================================================
+'''
 def announcements_api(request):
   user_id = request.session.get('userId') # lấy user hiện tại
   if not user_id:
@@ -411,12 +420,12 @@ def announcements_api(request):
     cursor.execute("""
       SELECT a.title, a.content, a.createdAt, t.fullName AS senderName
       FROM Announcements a
-      JOIN Courses c ON a.courseId = c.courseId
-      join Teachers t on c.teacherId = t.teacherId
-      JOIN Students_Courses sc ON c.courseId = sc.courseId
+      JOIN Classes cl ON a.classId = cl.classId
+      join Teachers t on cl.teacherId = t.teacherId
+      JOIN Students_Classes sc ON cl.classId = sc.classId
       JOIN Students s ON sc.studentId = s.studentId
-      WHERE sc.studentId = %s
-      ORDER BY a.createdAt DESC
+      WHERE s.studentId = %s
+      ORDER BY a.createdAt DESC;
     """, [user_id])
     rows = cursor.fetchall()
 
@@ -482,7 +491,7 @@ def get_events_api(request):
                 FROM Events
                 WHERE receiver = 'ALL' OR receiver = %s
                 ORDER BY time DESC
-                LIMIT 10
+                LIMIT 2
             """, [user_role])
             rows = cursor.fetchall()
 
@@ -712,3 +721,28 @@ def api_weather(request):
         "icon": data["weather"][0]["icon"]  # icon OpenWeather
     }
     return JsonResponse(result)
+
+'''
+=============================================
+=============== CHATBOT =====================
+=============================================
+'''
+# views.py
+import google.generativeai as genai
+from django.http import JsonResponse
+
+# Cấu hình API key
+genai.configure(api_key="AIzaSyCDKIXN_eX3lt1knY39jX76hp8QrKSWuuM")
+model = genai.GenerativeModel("gemini-2.5-flash")
+
+def chat_ai_api(request):
+    user_input = request.GET.get("q", "")
+    if not user_input:
+        return JsonResponse({"error": "No input provided"}, status=400)
+
+    prompt = f"{user_input} Trả lời dưới 100 chữ."
+    try:
+        response = model.generate_content(prompt)
+        return JsonResponse({"answer": response.text})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

@@ -239,3 +239,100 @@ ul {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
+
+/* 
+====================================================================
+====== STYLE PHẦN XEM THÔNG TIN SINH VIÊN THEO MÃ MÔN HỌC===========
+====================================================================
+*/
+/* Container tổng */
+.student-infor {
+    background-color: #003366; /* xanh nước biển đậm */
+    color: #ffffff; /* chữ màu trắng cho tương phản */
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 800px;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-family: Arial, sans-serif;
+}
+
+/* Tiêu đề */
+.student-infor-title h3 {
+    margin: 0 0 15px 0;
+    font-size: 1.5rem;
+    color: #00bfff; /* xanh sáng làm nổi bật */
+}
+
+/* Form tìm kiếm */
+#search-course-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#search-course-form input[type="text"] {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+}
+
+#search-course-form button {
+    background-color: #00bfff; /* xanh sáng button */
+    color: #003366; /* chữ xanh đậm */
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#search-course-form button:hover {
+    background-color: #009acd; /* xanh khi hover */
+}
+
+/* Nội dung thông tin */
+.student-course-content {
+    background-color: #00509e; /* xanh nước biển trung bình */
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.student-course-content div {
+    margin-bottom: 10px;
+}
+
+/* Bảng trong list-student */
+.student-infor .list-student table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    background-color: #00509e; /* xanh nhạt cho nền bảng */
+    color: #ffffff; /* chữ trắng */
+}
+
+.student-infor .list-student th {
+    background-color: #003366; /* xanh nước biển đậm cho header */
+    color: #ffffff;
+    padding: 10px;
+    text-align: left;
+}
+
+.student-infor .list-student td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #00bfff; /* đường phân cách xanh sáng */
+}
+
+.student-infor .list-student tr:hover {
+    background-color: #004080; /* xanh đậm khi hover row */
+}
+
+.student-infor .list-student table th:first-child,
+.student-infor .list-student table td:first-child {
+    text-align: center; /* căn giữa cột Mã sinh viên */
+}
+
+.courseId-classId, .teacher-name, table > tbody td{
+  color: #fff;
+}
