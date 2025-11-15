@@ -12,6 +12,7 @@
     {% block page_css %}{% endblock %}
 
     <style>
+       /* CHỈ GIỮ LẠI CSS CHO DROPDOWN TÀI KHOẢN */
        .profile-dropdown-header { padding: 10px 16px; font-size: 1.1em; font-weight: bold; color: #333; border-bottom: 1px solid #eee; }
        .profile-container { position: relative; display: flex; align-items: center; cursor: pointer; }
        .profile-dropdown { display: none; position: absolute; top: 100%; right: 0; background-color: white; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 1000; min-width: 200px; overflow: hidden; }
@@ -19,6 +20,13 @@
        .profile-dropdown a:hover { background-color: #f5f5f5; }
        .profile-dropdown a i { margin-right: 10px; color: #555; width: 16px; }
        .profile-dropdown.show { display: block; }
+
+       /* ===============================================================
+       == PHẦN SỬA Ở ĐÂY ==
+       XÓA CSS CỦA CHATBOT KHỎI ĐÂY (VÌ NÓ ĐÃ CÓ TRONG GENERAL.CSS)
+       ===============================================================
+       */
+
     </style>
 </head>
 <body>
@@ -28,20 +36,16 @@
                 <img src="{% static 'image/logo_haui.jpg' %}" alt="">
                 <span>HaUI</span>
             </div>
-
             <nav class="nav-menu">
                 <a href="https://itc.haui.edu.vn/vn" target="_blank" class="nav-item"><i class="fas fa-th-large"></i>Trung tâm công nghệ thông tin (Sict)</a>
                 <a href="https://sv.haui.edu.vn/" target="_blank" class="nav-item"><i class="fa-solid fa-globe"></i></i>Trang trang đại học điện tử</a>
                 
                 {% if request.session.role == 'admin' %}
                     {% url 'admin_home' as homepage_url %}
-                
                 {% elif request.session.role == 'teacher' %}
                     {% url 'teacher_home' as homepage_url %}
-                
                 {% elif request.session.role == 'student' %}
                     {% url 'student_home' as homepage_url %}
-                
                 {% else %}
                     {% url 'login' as homepage_url %}
                 {% endif %}
@@ -49,9 +53,7 @@
                 <a href="{{ homepage_url }}" class="nav-item {% block timetable_active %}{% endblock %}">
                     <i class="fas fa-clock"></i>Thời khóa biểu
                 </a>
-
                 {% block role_specific_links %}{% endblock role_specific_links %}
-
                 {% block add_sidebar %}{% endblock add_sidebar %}
             </nav>
         </div>
@@ -67,9 +69,7 @@
                 <div class="profile-container" id="profile-trigger">
                     {% block user_info %}
                         {% endblock user_info %}
-                    
                     <i class="fas fa-user-circle profile-icon"></i>
-
                     <div class="profile-dropdown" id="profile-menu">
                         <div class="profile-dropdown-header">Quản lý tài khoản</div>
                         <a href="{% url 'profile_management' %}"><i class="fas fa-edit"></i> Cập nhật thông tin</a>
@@ -80,17 +80,43 @@
             </div>
 
             <div class="child-main-content">    
+                
                 {% block content %}
                 {% endblock content %}
+
+                <div class="child-main-content-right">
+                    <div class="calendar-widget">
+                        <div class="calendar">
+                            <h1>Calendar</h1>
+                            <header>
+                                <h3></h3>
+                                <nav>
+                                    <button id="prev"></button>
+                                    <button id="next"></button>
+                                </nav>
+                            </header>
+                            <section>
+                                <ul class="days">
+                                    <li>Sun</li> <li>Mon</li> <li>Tue</li> <li>Wed</li> <li>Thu</li> <li>Fri</li> <li>Sat</li>
+                                </ul>
+                                <ul class="dates"></ul>
+                            </section>
+                        </div>
+                    </div>
+                    
+                    <div class="upcoming-events">
+                        <h3>Sự kiện sắp tới</h3>
+                        <div class="event-container"></div>
+                    </div> 
+
+                </div>
+
             </div>     
         </div>
     </div>
 
-    <script src="{% static 'style/calendar.js' %}"></script>
-    <script src="{% static 'style/general.js' %}"></script>
-    {% block scripts %}{% endblock scripts %}
     <script>
-        // (Code JS cho menu dropdown, giữ nguyên)
+        // 1. (Code JS cho menu dropdown, chạy ĐẦU TIÊN)
         document.addEventListener('DOMContentLoaded', function() {
             const profileTrigger = document.getElementById('profile-trigger');
             const profileMenu = document.getElementById('profile-menu');
@@ -109,5 +135,27 @@
             });
         });
     </script>
+    
+    <script src="{% static 'style/chat.js' %}"></script>
+
+    {% block scripts %}{% endblock scripts %} 
+
+    <script src="{% static 'style/calendar.js' %}"></script>
+    <script src="{% static 'style/general.js' %}"></script>
+
+
+    <div id="ai-chat-icon">🤖</div>
+    <div id="ai-chat-popup">
+        <div id="ai-chat-header">
+            <span>AI Chat</span>
+            <button id="ai-chat-close">&times;</button>
+        </div>
+        <div id="ai-chat-body"></div>
+        <form id="ai-chat-form">
+            <input type="text" id="ai-chat-input" placeholder="Nhập câu hỏi..." required maxlength="100">
+            <button type="submit">Gửi</button>
+        </form>
+    </div>
+
 </body>
 </html>
