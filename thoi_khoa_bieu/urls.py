@@ -15,7 +15,9 @@ urlpatterns = [
     path('admin/scheduling/', include('schedule_manager.urls')),
     path('admin/', admin.site.urls),
     
-    
+    # Thêm đường dẫn cho app mới
+    path('attendance/', include('attendance_module.urls')),
+    path('grades/', include('quanlydiem.urls')),
     # Kích hoạt các link 'logout', 'password_change'
     
     # Dòng này sẽ bao gồm TẤT CẢ các URL

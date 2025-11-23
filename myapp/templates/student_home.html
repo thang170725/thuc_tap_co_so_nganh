@@ -10,6 +10,12 @@
 
 {% block timetable_active %}active{% endblock %}
 
+{% block add_sidebar %}
+    <a href="{% url 'student_my_grades' %}" class="nav-item">
+        <i class="fa-solid fa-graduation-cap"></i> Xem bảng điểm
+    </a>
+{% endblock add_sidebar %}
+
 {% block user_info %}
     <div class="get-username" data-student="{{studentId}}" data-role="{{ user_role }}">
         Xin chào, {{ username }}<br> 

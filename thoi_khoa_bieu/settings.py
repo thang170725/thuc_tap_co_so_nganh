@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'user_manager',
     'academic_manager',
     'schedule_manager',
+    'attendance_module',
+    'quanlydiem',
 ]
 
 MIDDLEWARE = [
@@ -80,8 +82,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'MyDatabase',
-        'USER': 'exp_user',
-        'PASSWORD': '123456',
+        'USER': 'root',
+        'PASSWORD': '19042005',
         'HOST': '127.0.0.1',
         'PORT': '3306',
     }

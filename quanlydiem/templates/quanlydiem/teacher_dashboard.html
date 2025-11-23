@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Danh sách lớp phụ trách{% endblock %}
+
+{% block content %}
+<div style="padding: 20px; margin-left: 260px;"> 
+    <h2>Danh sách lớp phụ trách</h2>
+    <p>Chọn lớp để tiến hành nhập điểm:</p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+        {% for lop in classes %}
+        <div style="border: 1px solid #ccc; padding: 20px; border-radius: 8px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h3 style="color: #2c3e50; margin-top: 0;">{{ lop.classId }}</h3>
+            <p><strong>Môn:</strong> {{ lop.courseId.courseName }}</p>
+            <p><strong>Học kỳ:</strong> {{ lop.semester }}</p>
+            
+            <a href="{% url 'teacher_input_grades' lop.classId %}" 
+               style="display: inline-block; background-color: #3498db; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+               <i class="fa-solid fa-pen-to-square"></i> Vào nhập điểm
+            </a>
+        </div>
+        {% empty %}
+            <p>Hiện tại bạn chưa phụ trách lớp nào.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

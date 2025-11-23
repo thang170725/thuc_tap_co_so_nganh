@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Danh sách Lớp học - {{ teacher_name }}</title>
+</head>
+<body>
+    <h2>📚 Các Lớp học do {{ teacher_name }} phụ trách</h2>
+    
+    <table border="1" style="width: 80%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th>Mã Lớp</th>
+                <th>Tên Môn học</th>
+                <th>Học kỳ</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for cls in class_list %}
+            <tr>
+                <td>{{ cls.classId }}</td>
+                <td>{{ cls.courseName }}</td>
+                <td>{{ cls.semester }}</td>
+                <td>
+                    <a href="{% url 'teacher_attendance' class_id=cls.classId %}">
+                        <button type="button" style="background-color: #007bff; color: white; padding: 5px 10px;">
+                            Điểm danh
+                        </button>
+                    </a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">Không tìm thấy lớp học nào.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

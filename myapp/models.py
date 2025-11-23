@@ -276,4 +276,59 @@ class Events(models.Model):
         ordering = ['-time']
         
     def __str__(self):
-        return self.title
+        return self.title 
+    
+## 13. Bảng Attendances 
+class Attendances(models.Model):
+    STATUS_CHOICES = [
+        ('PRESENT', 'Có mặt'),
+        ('ABSENT', 'Vắng mặt'),
+        ('LATE', 'Đi muộn'),
+    ]
+
+    attendanceId = models.AutoField(primary_key=True)
+    classId = models.CharField(max_length=20)
+    studentId = models.CharField(max_length=20) 
+    date = models.DateField()
+    
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PRESENT')
+    note = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        managed = False  # <--- QUAN TRỌNG: Thêm dòng này để không sửa DB cũ
+        db_table = 'Attendances'
+        # Khóa duy nhất ngăn ngừa trùng lặp điểm danh:
+        unique_together = (('classId', 'studentId', 'date'),)
+
+## 14. Bảng Grade 
+# Thêm Model Grade vào đây
+class Grades(models.Model):
+    gradeId = models.AutoField(primary_key=True, db_column='gradeId')
+    
+    # SỬA LỖI Ở ĐÂY:
+    # Thay 'Student' (sai) thành 'Students' (đúng tên class ở Bảng 2)
+    student = models.ForeignKey(
+        'Students', 
+        on_delete=models.CASCADE, 
+        db_column='studentId'
+    )
+    
+    # Thay 'Class' (sai) thành 'Classes' (đúng tên class ở Bảng 9)
+    class_obj = models.ForeignKey(
+        'Classes', 
+        on_delete=models.CASCADE, 
+        db_column='classId'
+    )
+    
+    attendanceScore = models.DecimalField(max_digits=5, decimal_places=2, default=0, db_column='attendanceScore')
+    midtermScore = models.DecimalField(max_digits=5, decimal_places=2, default=0, db_column='midtermScore')
+    finalScore = models.DecimalField(max_digits=5, decimal_places=2, default=0, db_column='finalScore')
+    
+    totalScore = models.DecimalField(max_digits=5, decimal_places=2, db_column='totalScore', blank=True, null=True, editable=False)
+    
+    updatedAt = models.DateTimeField(auto_now=True, db_column='updatedAt')
+
+    class Meta:
+        managed = False 
+        db_table = 'Grades'
+        unique_together = (('student', 'class_obj'),)

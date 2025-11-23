@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Điểm danh Lớp {{ current_class.classId }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 20px; }
+        h2 { color: #333; }
+        
+        /* Style cho bảng */
+        table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        th { background-color: #007bff; color: white; padding: 12px; text-align: center; border: 1px solid #ddd; }
+        td { padding: 8px; border: 1px solid #ddd; vertical-align: middle; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+
+        /* --- PHẦN QUAN TRỌNG: CSS CHO NÚT RADIO --- */
+        /* Ẩn nút radio tròn mặc định của trình duyệt */
+        .status-options input[type="radio"] {
+            display: none; 
+        }
+
+        /* Container chứa 3 nút */
+        .status-options {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        /* Hình dáng của nút khi chưa chọn */
+        .status-label {
+            padding: 6px 15px;
+            border: 2px solid #ccc;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #ccc;
+            transition: all 0.3s ease;
+            display: inline-block;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* 1. Nút CÓ MẶT (Present) - Khi được chọn */
+        input[value="PRESENT"]:checked + label {
+            background-color: #28a745; /* Màu xanh lá */
+            color: white;
+            border-color: #28a745;
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
+        }
+
+        /* 2. Nút VẮNG (Absent) - Khi được chọn */
+        input[value="ABSENT"]:checked + label {
+            background-color: #dc3545; /* Màu đỏ */
+            color: white;
+            border-color: #dc3545;
+            box-shadow: 0 0 8px rgba(220, 53, 69, 0.5);
+        }
+
+        /* 3. Nút MUỘN (Late) - Khi được chọn */
+        input[value="LATE"]:checked + label {
+            background-color: #ffc107; /* Màu vàng */
+            color: black;
+            border-color: #ffc107;
+            box-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
+        }
+        
+        /* Hiệu ứng khi di chuột vào */
+        .status-label:hover { opacity: 0.8; border-color: #999; color: #666; }
+
+        /* Style cho ô nhập Ghi chú */
+        .note-input { width: 90%; padding: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        
+        /* Style cho số liệu thống kê */
+        .stat-text { font-weight: bold; text-align: center; }
+        .red-text { color: red; }
+        .orange-text { color: #d39e00; }
+
+        /* Nút Lưu */
+        .btn-save {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-save:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <h2>📋 Điểm danh Lớp: {{ current_class.classId }}</h2>
+    <p>Ngày điểm danh: <strong>{{ attendance_date|date:"d/m/Y" }}</strong></p>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        {{ formset.management_form }}
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;">STT</th>
+                    <th style="width: 120px;">Mã SV</th>
+                    <th>Họ và tên</th>
+                    <th style="width: 250px;">Trạng thái</th> <th>Ghi chú</th>
+                    <th style="width: 80px;">Tổng Nghỉ</th>
+                    <th style="width: 80px;">Tổng Muộn</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for form in formset %}
+                <tr>
+                    <td style="text-align: center;">{{ forloop.counter }}</td>
+                    <td style="text-align: center;">
+                        {{ form.studentId }}
+                        {% if form.instance.pk %}{{ form.attendanceId }}{% endif %}
+                        
+                        {{ form.studentId.value }} 
+                    </td>
+                    <td>
+                        <strong>{{ form.full_name }}</strong>
+                    </td>
+                    
+                    <td style="text-align: center;">
+                        <div class="status-options">
+                            {% for radio in form.status %}
+                                <div class="radio-item">
+                                    {{ radio.tag }} <label for="{{ radio.id_for_label }}" class="status-label">
+                                        {% if radio.data.value == 'PRESENT' %} ✔ {% endif %}
+                                        {% if radio.data.value == 'ABSENT' %} ✖ {% endif %}
+                                        {% if radio.data.value == 'LATE' %} M {% endif %}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    
+                    <td>{{ form.note }}</td>
+
+                    <td class="stat-text red-text">
+                        {{ form.stats_absent|default:"0" }}
+                    </td>
+                    <td class="stat-text orange-text">
+                        {{ form.stats_late|default:"0" }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        
+        <div style="text-align: center;">
+            <button type="submit" class="btn-save">💾 Lưu Điểm danh</button>
+        </div>
+    </form>
+</body>
+</html>
