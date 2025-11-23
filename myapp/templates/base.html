@@ -20,13 +20,6 @@
        .profile-dropdown a:hover { background-color: #f5f5f5; }
        .profile-dropdown a i { margin-right: 10px; color: #555; width: 16px; }
        .profile-dropdown.show { display: block; }
-
-       /* ===============================================================
-       == PHẦN SỬA Ở ĐÂY ==
-       XÓA CSS CỦA CHATBOT KHỎI ĐÂY (VÌ NÓ ĐÃ CÓ TRONG GENERAL.CSS)
-       ===============================================================
-       */
-
     </style>
 </head>
 <body>
@@ -143,19 +136,28 @@
     <script src="{% static 'style/calendar.js' %}"></script>
     <script src="{% static 'style/general.js' %}"></script>
 
+    <div id="ai-chat-icon">
+    <!-- Icon AI SVG đẹp -->
+    <svg viewBox="0 0 24 24" width="32" height="32" fill="none">
+        <circle cx="12" cy="12" r="10" fill="#0d6efd"/>
+        <path d="M12 7a3 3 0 0 0-3 3v1H8v2h1v1a3 3 0 0 0 6 0v-1h1v-2h-1v-1a3 3 0 0 0-3-3z" fill="white"/>
+    </svg>
+</div>
 
-    <div id="ai-chat-icon">🤖</div>
-    <div id="ai-chat-popup">
-        <div id="ai-chat-header">
-            <span>AI Chat</span>
-            <button id="ai-chat-close">&times;</button>
-        </div>
-        <div id="ai-chat-body"></div>
-        <form id="ai-chat-form">
-            <input type="text" id="ai-chat-input" placeholder="Nhập câu hỏi..." required maxlength="100">
-            <button type="submit">Gửi</button>
-        </form>
+<div id="ai-chat-popup">
+    <div id="ai-chat-header">
+        <span>AI Chat</span>
+        <button id="ai-chat-close">&times;</button>
     </div>
+
+    <div id="ai-chat-body"></div>
+
+    <form id="ai-chat-form">
+        <input type="text" id="ai-chat-input" placeholder="Nhập câu hỏi..." required maxlength="100">
+        <button type="submit">Gửi</button>
+    </form>
+</div>
+
 
 </body>
 </html>

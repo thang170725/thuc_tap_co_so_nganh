@@ -19,25 +19,15 @@ import matplotlib.font_manager as fm
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 import io
 import requests
+from django.contrib.auth import logout # (Vẫn dùng logout của Django để xóa session)
+from .forms import ProfileUpdateForm, CustomPasswordChangeForm
+from .models import Users, Students, Teachers, Admins
+
 '''
 ==============================================================
 =================== VIEWS LOGIN CHUYÊN ROLE ==================
 ==============================================================
 '''
-# myapp/views.py
-# ... (các import cũ của bạn) ...
-
-# --- ĐẢM BẢO BẠN ĐÃ IMPORT NHỮNG THỨ NÀY ---
-from django.db import connection
-from django.contrib.auth import logout # (Vẫn dùng logout của Django để xóa session)
-from .forms import ProfileUpdateForm, CustomPasswordChangeForm
-from .models import Users, Students, Teachers, Admins
-# -------------------------------------------
-
-
-#
-# --- 1. THAY THẾ HÀM NÀY ---
-#
 def profile_management(request):
     # Dùng hệ thống session của bạn
     user_id = request.session.get('userId')
@@ -147,6 +137,7 @@ def custom_logout_view(request):
     logout(request) # Hàm này chỉ xóa session, rất an toàn
     messages.info(request, 'Bạn đã đăng xuất.')
     return redirect('login')
+
 def login_view(request):
   if request.method == "POST":
     username = request.POST.get('username') # lấy tài khoản trong trang login
@@ -180,8 +171,12 @@ def login_view(request):
 =================== VIEWS TRANG SINH VIÊN ====================
 ==============================================================
 '''
-# ================ VIEWS PHỤ TRANG SINH VIÊN =================
-# hàm lấy tên của sinh viên đưa lên giao diện
+
+'''
+==============================================================
+====== HÀM LẤY TÊN SINH VIÊN ĐƯA LÊN GIAO DIỆN ===============
+==============================================================
+'''
 def fetch_username(user_id):
   with connection.cursor() as cursor:
     cursor.execute('''
@@ -191,13 +186,13 @@ def fetch_username(user_id):
     ''', [user_id])
     row = cursor.fetchone()
   return row[0] if row else None
+
 # hàm lấy ra thời khóa biểu đưa lên trang sinh viên
 # --- THAY THẾ TOÀN BỘ HÀM NÀY ---
 #
 # hàm lấy ra thời khóa biểu đưa lên trang sinh viên
 def fetch_timetable(user_id):
-  with connection.cursor() as cursor:
-    
+  with connection.cursor() as cursor:  
     # --- ĐÂY LÀ CÂU SQL ĐÃ SỬA LỖI ---
     # (Nó sẽ tìm TKB dựa trên Lớp học (Classes)
     # thay vì Môn học (Courses) như code cũ)
@@ -238,10 +233,11 @@ def fetch_timetable(user_id):
   # Tạo khung 7 ngày (Mon → Sun)
   days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
   return {day: timetable.get(day, []) for day in days}
-#
-# --- KẾT THÚC HÀM CẦN THAY THẾ ---
-#
-# =================== HÀM GỬI RESPONSE ĐẾN TRANG SINH VIÊN ===================
+'''
+========================================
+===== API CHO TRANG SINH VIÊN ==========
+========================================
+'''
 
 # hàm lấy chi tiết môn học đưa lên giao diện
 def course_detail_api(request, course_id):
@@ -286,6 +282,40 @@ def student__infor_detail_api(request, student_id):
       return JsonResponse(student)
   except Exception as e:
     return JsonResponse({"error": str(e)}, status=500)
+  
+'''
+==============================================================
+======== XEM THÔNG BÁO =======================================
+==============================================================
+'''
+def announcements_api(request):
+  user_id = request.session.get('userId') # lấy user hiện tại
+  if not user_id:
+    return JsonResponse({'error': 'chưa đăng nhập'}, status=403)
+  
+  with connection.cursor() as cursor:
+    cursor.execute("""
+      SELECT a.title, a.content, a.createdAt, t.fullName AS senderName
+      FROM Announcements a
+      JOIN Classes cl ON a.classId = cl.classId
+      join Teachers t on cl.teacherId = t.teacherId
+      JOIN Students_Classes sc ON cl.classId = sc.classId
+      JOIN Students s ON sc.studentId = s.studentId
+      WHERE s.studentId = %s
+      ORDER BY a.createdAt DESC;
+    """, [user_id])
+    rows = cursor.fetchall()
+
+  announcements = []
+  for title, content, createdAt, senderName in rows:
+    announcements.append({
+      "title": title,
+      "content": content,
+      "createdAt": createdAt.strftime("%Y-%m-%d %H:%M:%S"),
+      "senderName": senderName,
+    })
+
+  return JsonResponse({"announcements": announcements})
 # ======================== VIEW CHÍNH TRANG SINH VIÊN ========================
 def student_home(request):
   user_id = request.session.get('userId')
@@ -405,40 +435,6 @@ def teacher_home(request):
     'user_role': 'TEACHER'
   }
   return render(request, "teacher_home.html", context)
-
-'''
-==============================================================
-======== XEM THÔNG BÁO =======================================
-==============================================================
-'''
-def announcements_api(request):
-  user_id = request.session.get('userId') # lấy user hiện tại
-  if not user_id:
-    return JsonResponse({'error': 'chưa đăng nhập'}, status=403)
-  
-  with connection.cursor() as cursor:
-    cursor.execute("""
-      SELECT a.title, a.content, a.createdAt, t.fullName AS senderName
-      FROM Announcements a
-      JOIN Classes cl ON a.classId = cl.classId
-      join Teachers t on cl.teacherId = t.teacherId
-      JOIN Students_Classes sc ON cl.classId = sc.classId
-      JOIN Students s ON sc.studentId = s.studentId
-      WHERE s.studentId = %s
-      ORDER BY a.createdAt DESC;
-    """, [user_id])
-    rows = cursor.fetchall()
-
-  announcements = []
-  for title, content, createdAt, senderName in rows:
-    announcements.append({
-      "title": title,
-      "content": content,
-      "createdAt": createdAt.strftime("%Y-%m-%d %H:%M:%S"),
-      "senderName": senderName,
-    })
-
-  return JsonResponse({"announcements": announcements})
 
 def api_reminders(request):
     student_id = request.session.get("userId")

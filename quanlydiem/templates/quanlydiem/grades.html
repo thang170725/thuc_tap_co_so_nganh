@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bảng điểm cá nhân{% endblock title %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'style/grades.css' %}">
+    <link rel="stylesheet" href="{% static 'style/general.css' %}">
+{% endblock page_css %}
+
+{% block add_sidebar %}
+    <a href="{% url 'student_my_grades' %}" class="nav-item active">
+        <i class="fa-solid fa-graduation-cap"></i> Xem bảng điểm
+    </a>
+{% endblock add_sidebar %}
+
+{% block user_info %}
+    <div class="get-username" data-student="{{studentId}}" data-role="{{ user_role }}">
+        Xin chào, {{ username }}<br> 
+        <span style="font-size: 16px;">Sinh viên</span>
+    </div>
+{% endblock user_info %}
+
+{% block content %}
+    <div class="classes-list">
+        <section class="week-view">
+            <ul class="week-days"></ul>
+            <div id="weather-container"></div>
+        </section>
+
+        <div class="grades-container">
+            <h2>Bảng điểm cá nhân</h2>
+
+            <table class="grade-table">
+                <thead>
+                    <tr>
+                        <th>Môn học</th>
+                        <th>Mã lớp</th>
+                        <th>Số tín chỉ</th>
+                        <th>Thường Xuyên 1</th>
+                        <th>Giữa kỳ</th>
+                        <th>Thường xuyên 2</th>
+                        <th>Cuối kỳ</th>
+                        <th>Tổng kết</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in bang_diem %}
+                    <tr>
+                        <td class="left-align">{{ item.class_obj.courseId.courseName }}</td>
+                        <td>{{ item.class_obj.classId }}</td>
+                        <td>{{ item.class_obj.courseId.credits }}</td>
+                        <td>{{ item.attendanceScore }}</td>
+                        <td>{{ item.midtermScore }}</td>
+                        <td>{{ item.finalScore }}</td>
+                        <td class="total-score {% if item.totalScore < 4 %}fail{% else %}pass{% endif %}">
+                            {{ item.totalScore|default:"Chưa có" }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7">Bạn chưa có điểm môn học nào.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block scripts %}
+    <script src="{% static 'style/student_home_api.js' %}"></script>
+    <script src="{% static 'style/general_student.js' %}"></script>
+{% endblock scripts %}

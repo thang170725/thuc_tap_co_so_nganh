@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 # Import đúng tên Model số nhiều như trong myapp/models.py
 from myapp.models import Classes, Grades, Students_Classes, Students, Teachers
+from myapp.views import fetch_username
 
 # 1. View Giảng viên nhập điểm
 def teacher_input_grades(request, class_id):
@@ -65,20 +66,27 @@ def teacher_input_grades(request, class_id):
         'data': data_hien_thi
     })
 
-# 2. View Sinh viên xem điểm
+'''
+=========================================
+======== VIEW SINH VIÊN XEM ĐIỂM ========
+=========================================
+'''
 def student_my_grades(request):
+    user_id = request.session.get('userId')
     # TODO: Sau này thay bằng request.user.username hoặc logic lấy sinh viên từ session
     ma_sv_hien_tai = 'S001' 
     
     # SỬA: Student -> Students
     student = get_object_or_404(Students, studentId=ma_sv_hien_tai)
-    
-    # SỬA: 
-    # 1. Grade -> Grades
-    # 2. class_obj__course -> class_obj__courseId (Vì trong Classes, FK tên là courseId)
+    username = fetch_username(user_id)
     bang_diem = Grades.objects.filter(student=student).select_related('class_obj', 'class_obj__courseId')
-    
-    return render(request, 'quanlydiem/student_view.html', {'bang_diem': bang_diem})
+    context = {
+        'studentId': user_id,
+        'username': username,
+        'user_role': 'STUDENT',
+        'bang_diem': bang_diem
+    }
+    return render(request, 'quanlydiem/grades.html', context)
 
 # 3. View Dashboard (Thêm cái này để nút Sidebar hoạt động)
 def teacher_grade_dashboard(request):

@@ -175,6 +175,7 @@
     position: relative;
     display: inline-block;
 }
+
 .information {
     display: none;
     position: absolute;
@@ -523,75 +524,97 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    font-size: 40px;
+    width: 60px;
+    height: 60px;
+    background: #0d6efd; /* xanh nước biển đậm */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
-    padding: 10px;
-    border: 1px solid var(--class-bg-calendar);
-    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 65, 150, 0.4);
+    transition: 0.25s;
 }
 
-#ai-chat-icon:hover{
-    background-color: #e06e11;
-    transition: all 1s;
-    border: none;
+#ai-chat-icon:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 18px rgba(0, 65, 150, 0.6);
 }
 
+/* CHAT POPUP */
 #ai-chat-popup {
     display: none;
     position: fixed;
-    bottom: 70px;
+    bottom: 90px;
     right: 20px;
-    width: 400px;
-    height: 400px;
-    background: hsl(210, 100%, 31%);
-    color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
-    flex-direction: column;
+    width: 380px;
+    height: 420px;
+    background: #0b2e59;
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
     overflow: hidden;
-    z-index: 1000;
+    z-index: 999;
+    flex-direction: column;
 }
 
+/* HEADER */
 #ai-chat-header {
-    background: #003366;
-    padding: 10px;
+    background: #084298; /* Xanh đậm */
+    padding: 12px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-weight: bold;
 }
 
+#ai-chat-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #fff;
+    cursor: pointer;
+}
+
+#ai-chat-close:hover {
+    color: #ffb3b3;
+}
+
+/* CHAT BODY */
 #ai-chat-body {
-    padding: 10px;
     flex: 1;
+    padding: 12px;
     overflow-y: auto;
 }
 
+/* TEXT ALWAYS WHITE */
 #ai-chat-body p {
-    margin: 5px 0;
-    /* ===============================================================
-    == PHẦN SỬA Ở ĐÂY ==
-    Thêm dòng này để chữ chat LUÔN LUÔN là màu trắng
-    ===============================================================
-    */
     color: #fff;
+    margin: 8px 0;
 }
 
+/* INPUT FORM */
 #ai-chat-form {
     display: flex;
-    border-top: 1px solid #004080;
+    border-top: 1px solid #0d6efd;
 }
 
-#ai-chat-form input {
+#ai-chat-input {
     flex: 1;
-    padding: 5px;
+    padding: 10px;
     border: none;
     outline: none;
 }
 
 #ai-chat-form button {
-    background: #004080;
+    background: #0d6efd;
     border: none;
-    color: #fff;
-    padding: 0 10px;
+    padding: 0 16px;
+    color: white;
     cursor: pointer;
+    font-weight: bold;
+}
+
+#ai-chat-form button:hover {
+    background: #0855c1;
 }

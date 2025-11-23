@@ -1,0 +1,88 @@
+/* Container tổng */
+.grades-container {
+    padding: 30px;
+    margin: 20px auto;
+    max-width: 1200px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Tiêu đề */
+.grades-container h2 {
+    color: #0D3B66; /* xanh nước biển đậm */
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+/* Bảng điểm */
+.grade-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Header bảng */
+.grade-table th {
+    background-color: #0D3B66; /* xanh nước biển đậm */
+    color: #ffffff;
+    padding: 14px 10px;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* Ô dữ liệu */
+.grade-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    font-size: 15px;
+}
+
+/* Căn trái cho tên môn học */
+.left-align {
+    text-align: left;
+    padding-left: 15px;
+}
+
+/* Row xen kẽ màu nhạt */
+.grade-table tr:nth-child(even) {
+    background-color: #f1f7fb;
+}
+
+/* Hover nhẹ */
+.grade-table tr:hover {
+    background-color: #d0e6f7;
+    transition: 0.3s;
+}
+
+/* Tổng kết: pass / fail */
+.total-score.pass {
+    font-weight: bold;
+    color: #0D3B66; /* xanh nước biển đậm */
+}
+
+.total-score.fail {
+    font-weight: bold;
+    color: #e63946; /* đỏ nổi bật */
+}
+
+/* Responsive: co nhỏ trên mobile */
+@media screen and (max-width: 768px) {
+    .grades-container {
+        padding: 15px;
+        margin-left: 0;
+    }
+
+    .grade-table th, .grade-table td {
+        font-size: 13px;
+        padding: 8px 6px;
+    }
+    
+    .grades-container h2 {
+        font-size: 22px;
+    }
+}

@@ -305,15 +305,12 @@ class Attendances(models.Model):
 class Grades(models.Model):
     gradeId = models.AutoField(primary_key=True, db_column='gradeId')
     
-    # SỬA LỖI Ở ĐÂY:
-    # Thay 'Student' (sai) thành 'Students' (đúng tên class ở Bảng 2)
     student = models.ForeignKey(
         'Students', 
         on_delete=models.CASCADE, 
         db_column='studentId'
     )
     
-    # Thay 'Class' (sai) thành 'Classes' (đúng tên class ở Bảng 9)
     class_obj = models.ForeignKey(
         'Classes', 
         on_delete=models.CASCADE, 
@@ -323,12 +320,12 @@ class Grades(models.Model):
     attendanceScore = models.DecimalField(max_digits=5, decimal_places=2, default=0, db_column='attendanceScore')
     midtermScore = models.DecimalField(max_digits=5, decimal_places=2, default=0, db_column='midtermScore')
     finalScore = models.DecimalField(max_digits=5, decimal_places=2, default=0, db_column='finalScore')
-    
-    totalScore = models.DecimalField(max_digits=5, decimal_places=2, db_column='totalScore', blank=True, null=True, editable=False)
-    
+
+    # ❌ XOÁ totalScore — KHÔNG khai báo trong Django
+
     updatedAt = models.DateTimeField(auto_now=True, db_column='updatedAt')
 
     class Meta:
-        managed = False 
+        managed = False  # vì bạn dùng bảng SQL có sẵn
         db_table = 'Grades'
         unique_together = (('student', 'class_obj'),)
