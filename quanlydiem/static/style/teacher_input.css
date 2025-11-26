@@ -1,0 +1,85 @@
+/* Tổng thể */
+.container2 {
+    padding: 20px;
+}
+
+/* Link quay lại */
+.back-link {
+    text-decoration: none;
+    color: gray;
+    margin-bottom: 20px;
+    display: inline-block;
+    font-weight: bold;
+}
+
+.back-link i {
+    margin-right: 5px;
+}
+
+/* Tiêu đề */
+.page-title {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #1A3E8E; /* xanh nước biển đậm */
+}
+
+.page-title span {
+    color: #0D2C6B; /* xanh đậm hơn cho classId */
+}
+
+/* Bảng điểm */
+.grade-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #f9faff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.grade-table th, .grade-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+.grade-table th {
+    background-color: #1A3E8E;
+    color: white;
+    font-weight: bold;
+}
+
+.grade-table td {
+    background-color: white;
+}
+
+/* Input điểm */
+.grade-input {
+    width: 60px;
+    text-align: center;
+    padding: 5px;
+    border: 1px solid #1A3E8E;
+    border-radius: 4px;
+}
+
+/* Button lưu */
+.btn-save {
+    padding: 12px 25px;
+    background: #1A3E8E;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.btn-save:hover {
+    background: #16306b;
+}
+
+/* Điểm trung bình */
+.total-score {
+    font-weight: bold;
+    color: red;
+}

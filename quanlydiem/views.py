@@ -3,68 +3,106 @@ from django.db import transaction
 # Import đúng tên Model số nhiều như trong myapp/models.py
 from myapp.models import Classes, Grades, Students_Classes, Students, Teachers
 from myapp.views import fetch_username
+from django.db import connection
 
-# 1. View Giảng viên nhập điểm
+from django.shortcuts import render, redirect
+from django.db import connection
+from django.contrib import messages
+from myapp.views import fetch_teachername
+
+'''
+=========================================
+======== VIEW GIÁO VIÊN NHẬP ĐIỂM =======
+=========================================
+'''
 def teacher_input_grades(request, class_id):
-    # SỬA: Class -> Classes
-    lop_hoc = get_object_or_404(Classes, classId=class_id)
-    
-    # SỬA: 
-    # 1. filter(class_obj=...) -> filter(classId=...) (vì trong Students_Classes tên cột là classId)
-    # 2. select_related('student') -> select_related('studentId') (vì tên cột là studentId)
-    danh_sach_sv = Students_Classes.objects.filter(classId=lop_hoc).select_related('studentId')
-    
-    # SỬA: Grade -> Grades
-    diem_hien_co = Grades.objects.filter(class_obj=lop_hoc)
-    
-    # Tạo dictionary để tra cứu điểm nhanh
-    # Lưu ý: g.student trả về object Students, g.student.pk trả về mã SV (string)
-    dict_diem = {g.student.pk: g for g in diem_hien_co}
+    # Lấy danh sách học sinh trong lớp
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT s.studentId, s.fullName, g.tx1, g.tx2, g.giua_ky, g.cuoi_ky, g.diem_trung_binh
+            FROM Students s
+            LEFT JOIN Grades g
+            ON s.studentId = g.studentId AND g.classId = %s
+            WHERE s.studentId IN (
+                SELECT studentId FROM Students WHERE classId=%s
+            )
+        """, [class_id, class_id])
+        result = cursor.fetchall()
+
+    students = []
+    for s in result:
+        students.append({
+            'studentId': s[0],
+            'fullName': s[1],
+            'tx1': s[2],
+            'tx2': s[3],
+            'giua_ky': s[4],
+            'cuoi_ky': s[5],
+            'diem_trung_binh': s[6],
+        })
 
     if request.method == 'POST':
-        try:
-            with transaction.atomic():
-                for item in danh_sach_sv:
-                    # SỬA: item.student -> item.studentId (vì ForeignKey tên là studentId)
-                    sv = item.studentId 
-                    ma_sv = sv.pk # Lấy khóa chính (studentId string)
-                    
-                    # Lấy dữ liệu từ form
-                    cc = request.POST.get(f'cc_{ma_sv}')
-                    gk = request.POST.get(f'gk_{ma_sv}')
-                    ck = request.POST.get(f'ck_{ma_sv}')
-                    
-                    # Xử lý input rỗng
-                    cc = float(cc) if cc else 0
-                    gk = float(gk) if gk else 0
-                    ck = float(ck) if ck else 0
+        with connection.cursor() as cursor:
+            for student in students:
+                student_id = student['studentId']
 
-                    # SỬA: Grade -> Grades
-                    Grades.objects.update_or_create(
-                        student=sv,
-                        class_obj=lop_hoc,
-                        defaults={
-                            'attendanceScore': cc,
-                            'midtermScore': gk,
-                            'finalScore': ck
-                        }
-                    )
-            return redirect('teacher_input_grades', class_id=class_id)
-        except Exception as e:
-            print(f"Lỗi: {e}")
+                tx1 = request.POST.get(f"tx1_{student_id}")
+                tx2 = request.POST.get(f"tx2_{student_id}")
+                giua_ky = request.POST.get(f"giua_ky_{student_id}")
+                cuoi_ky = request.POST.get(f"cuoi_ky_{student_id}")
 
-    # Chuẩn bị dữ liệu ra template
-    data_hien_thi = []
-    for item in danh_sach_sv:
-        # SỬA: item.student -> item.studentId
-        sv = item.studentId
-        diem = dict_diem.get(sv.pk)
-        data_hien_thi.append({'sv': sv, 'diem': diem})
+                try:
+                    tx1 = float(tx1) if tx1 else None
+                    tx2 = float(tx2) if tx2 else None
+                    giua_ky = float(giua_ky) if giua_ky else None
+                    cuoi_ky = float(cuoi_ky) if cuoi_ky else None
+                except ValueError:
+                    tx1 = tx2 = giua_ky = cuoi_ky = None
 
-    return render(request, 'quanlydiem/teacher_input.html', {
-        'lop': lop_hoc,
-        'data': data_hien_thi
-    })
+                # Kiểm tra xem bản ghi đã tồn tại
+                cursor.execute("""
+                    SELECT gradeId FROM Grades
+                    WHERE studentId = %s AND classId = %s
+                """, [student_id, class_id])
+                existing = cursor.fetchone()
+
+                if existing:
+                    cursor.execute("""
+                        UPDATE Grades
+                        SET tx1=%s, tx2=%s, giua_ky=%s, cuoi_ky=%s, created_at=CURRENT_TIMESTAMP
+                        WHERE gradeId=%s
+                    """, [tx1, tx2, giua_ky, cuoi_ky, existing[0]])
+                else:
+                    cursor.execute("""
+                        INSERT INTO Grades(studentId, classId, tx1, tx2, giua_ky, cuoi_ky)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                    """, [student_id, class_id, tx1, tx2, giua_ky, cuoi_ky])
+
+        return redirect('teacher_input_grades', class_id=class_id)
+    
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT c.courseName FROM Courses c
+                join Classes cl on c.courseId = cl.courseId
+                join Grades g on cl.classId = g.classId
+                WHERE cl.classId = %s
+            """, [class_id])
+        row = cursor.fetchone()
+        courseName = row[0] if row else None
+    
+    # lấy tên giảng viên
+    user_id = request.session.get('userId')
+    print("DEBUG userId =", request.session.get('userId'))
+    if not user_id:
+        return redirect('login')
+    username = fetch_teachername(user_id)
+
+    context = {
+        'lop': {'classId': class_id, 'courseName': courseName},  # update tên môn nếu cần
+        'students': students,
+        'username': username
+    }
+    return render(request, 'quanlydiem/teacher_input.html', context)
 
 '''
 =========================================
@@ -73,27 +111,54 @@ def teacher_input_grades(request, class_id):
 '''
 def student_my_grades(request):
     user_id = request.session.get('userId')
-    # TODO: Sau này thay bằng request.user.username hoặc logic lấy sinh viên từ session
-    ma_sv_hien_tai = 'S001' 
-    
-    # SỬA: Student -> Students
-    student = get_object_or_404(Students, studentId=ma_sv_hien_tai)
     username = fetch_username(user_id)
-    bang_diem = Grades.objects.filter(student=student).select_related('class_obj', 'class_obj__courseId')
+    with connection.cursor() as cursor:
+        cursor.execute('''
+            select c.courseName, cl.classId, c.credits, g.tx1, g.tx2, g.giua_ky, g.cuoi_ky,  
+                g.diem_trung_binh, g.created_at
+            from Courses c
+            join Classes cl on c.courseId = cl.courseId
+            join Grades g on cl.classId = g.classId
+            join Students s on g.studentId = s.StudentId
+            where s.studentId = %s
+            ORDER BY g.created_at DESC;
+        ''', [user_id])
+        rows = cursor.fetchall()
+
+    grades_list = []
+    for row in rows:
+        grades_list.append({
+            'course_name': row[0],
+            'class_id': row[1],
+            'credits': row[2],
+            'tx1': row[3],
+            'tx2': row[4],
+            'giua_ky': row[5],
+            'cuoi_ky': row[6],
+            'diem_trung_binh': row[7],
+            'created_at': row[8],
+        })
+
     context = {
         'studentId': user_id,
         'username': username,
         'user_role': 'STUDENT',
-        'bang_diem': bang_diem
+        'grades_list': grades_list
     }
+
     return render(request, 'quanlydiem/grades.html', context)
 
 # 3. View Dashboard (Thêm cái này để nút Sidebar hoạt động)
 def teacher_grade_dashboard(request):
-    # Tạm thời hardcode giáo viên T001
+    # lấy tên giảng viên
+    user_id = request.session.get('userId')
+    print("DEBUG userId =", request.session.get('userId'))
+    if not user_id:
+        return redirect('login')
+    username = fetch_teachername(user_id)
+
     current_teacher_id = 'T001' 
-    
-    # SỬA: Lấy danh sách lớp theo teacherId, select_related courseId
+
     classes = Classes.objects.filter(teacher__teacherId=current_teacher_id).select_related('courseId')
     
-    return render(request, 'quanlydiem/teacher_dashboard.html', {'classes': classes})
+    return render(request, 'quanlydiem/teacher_dashboard.html', {'classes': classes, 'username': username})

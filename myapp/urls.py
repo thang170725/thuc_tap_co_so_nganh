@@ -26,4 +26,5 @@ urlpatterns = [
     path('profile/', views.profile_management, name='profile_management'),
     path('password_change/', views.custom_password_change, name='custom_password_change'),
     path('logout/', views.custom_logout_view, name='custom_logout'),
+    path('/api/chat_ai/', views.chat_ai_api, name='chat_ai'),
 ]

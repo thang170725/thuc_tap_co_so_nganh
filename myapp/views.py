@@ -642,10 +642,18 @@ def admin_home(request):
   return render(request, "admin_home.html", context)
 
 def admin_teacher_infor(request):
-    return render(request, 'admin_teacher_infor.html')
+    user_id = request.session.get('userId')
+    if not user_id:
+      return redirect('login')
+    username = fetch_admin_name(user_id)
+    return render(request, 'admin_teacher_infor.html', {'username': username})
 
 def admin_student_infor(request):
-    return render(request, 'admin_student_infor.html')
+    user_id = request.session.get('userId')
+    if not user_id:
+      return redirect('login')
+    username = fetch_admin_name(user_id)
+    return render(request, 'admin_student_infor.html', {'username': username})
 
 def export_timetable_pdf(request):
     """Xuất thời khóa biểu giảng viên ra PDF"""
@@ -724,21 +732,81 @@ def api_weather(request):
 =============================================
 '''
 # views.py
+import os
+import traceback
 import google.generativeai as genai
 from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 
-# Cấu hình API key
-genai.configure(api_key="AIzaSyCDKIXN_eX3lt1knY39jX76hp8QrKSWuuM")
-model = genai.GenerativeModel("gemini-2.5-flash")
+# Lấy API key từ biến môi trường (an toàn hơn)
+API_KEY = os.environ.get("GENAI_API_KEY", "AIzaSyDX-SCsorOoM51ff2dPq5vZfqtnnjbIZn8")  # bỏ key thật ra env
 
+# Cấu hình
+genai.configure(api_key=API_KEY)
+# Bạn có thể giữ model khởi tạo ở top-level để reuse
+try:
+    model = genai.GenerativeModel("gemini-2.5-flash")
+except Exception:
+    model = None
+    print("Warning: failed to create GenerativeModel at import time.")
+    traceback.print_exc()
+
+@require_GET
 def chat_ai_api(request):
-    user_input = request.GET.get("q", "")
-    if not user_input:
+    q = request.GET.get("q", "").strip()
+    if not q:
         return JsonResponse({"error": "No input provided"}, status=400)
 
-    prompt = f"{user_input} Trả lời dưới 100 chữ."
+    if model is None:
+        return JsonResponse({"error": "Model not initialized"}, status=500)
+
     try:
+        prompt = f"{q}. Trả lời dưới 100 chữ."
+        # Gọi API
         response = model.generate_content(prompt)
-        return JsonResponse({"answer": response.text})
+
+        # Lấy text một cách an toàn (nhiều phiên bản trả khác nhau)
+        answer = None
+        # Thử attribute `text`
+        answer = getattr(response, "text", None)
+        if not answer:
+            # nhiều SDK trả về .candidates or .candidates[0].content.parts[0].text
+            try:
+                cand = getattr(response, "candidates", None)
+                if cand and len(cand) > 0:
+                    # một số dạng: candidate.content.parts[0].text
+                    candidate = cand[0]
+                    # inspect safe attributes
+                    answer = getattr(candidate, "content", None)
+                    if answer:
+                        # may be an object with parts
+                        parts = getattr(answer, "parts", None)
+                        if parts and len(parts) > 0:
+                            part0 = parts[0]
+                            answer = getattr(part0, "text", None) or getattr(part0, "payload", None)
+                        else:
+                            # maybe content is plain text
+                            answer = str(answer)
+                # fallback: try indexed access (if response is dict-like)
+                if not answer and isinstance(response, dict):
+                    # try common keys
+                    for key in ("text", "answer", "output"):
+                        if key in response:
+                            answer = response[key]
+                            break
+            except Exception:
+                answer = None
+
+        if not answer:
+            # as last resort stringify the response for debug
+            answer = str(response)
+
+        return JsonResponse({"answer": answer})
+
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        # In dev: print full traceback so bạn thấy lỗi trên console
+        tb = traceback.format_exc()
+        print("Error in chat_ai_api:", tb)
+
+        # Trả về lỗi cho client (trong production bạn có thể không trả trace)
+        return JsonResponse({"error": "Internal server error", "detail": str(e), "trace": tb}, status=500)

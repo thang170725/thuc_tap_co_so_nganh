@@ -13,4 +13,5 @@ urlpatterns = [
     # 2. Trang điểm danh chi tiết (Dynamic URL)
     # Vì <str:class_id> bắt tất cả các chuỗi ký tự, nó phải nằm ở cuối cùng (hoặc sau các đường dẫn tĩnh)
     path('<str:class_id>/', views.teacher_attendance_view, name='teacher_attendance'),
+    path('grades/attendance/<str:class_id>/', views.teacher_attendance, name='teacher_attendance'),
 ]

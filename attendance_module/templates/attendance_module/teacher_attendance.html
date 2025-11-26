@@ -6,16 +6,15 @@
 {% block page_css %}
     <link rel="stylesheet" href="{% static 'style/teacher_home.css' %}">
     <link rel="stylesheet" href="{% static 'style/general.css' %}">
+    <link rel="stylesheet" href="{% static 'style/attendance.css' %}">
 {% endblock %}
-
-{% block timetable_active %}active{% endblock %}
 
 {% block add_sidebar %}
     <a href="#" class="nav-item" id="send-ann-btn">
         <i class="fa-solid fa-share-from-square"></i>Gửi thông báo
     </a>
 
-    <a href="{% url 'teacher_class_list' %}" class="nav-item" id="attendance-btn">
+    <a href="{% url 'teacher_class_list' %}" class="nav-item active" id="attendance-btn">
         <i class="fa-solid fa-user-check"></i>Điểm danh
     </a>
 
@@ -48,7 +47,6 @@
     </div>
 {% endblock add_sidebar %}
 
-
 {% block role_specific_links %}
 {% endblock role_specific_links %}
 
@@ -69,9 +67,53 @@
         </section>
 
         <div>
-            <div id="timetable-container"></div>
-            <button id="export-btn">📄 Xuất PDF</button>
-        </div>   
+            <div>
+    <a href="{% url 'teacher_grade_dashboard' %}" style="text-decoration: none; color: gray; margin-bottom: 20px; display: inline-block;">
+        <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách lớp
+    </a>
+
+    <h2>Điểm danh lớp: <span style="color: #1A3E8E;">{{ class_id }}</span></h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        <label for="attendance_date">Ngày điểm danh:</label>
+        <input type="date" id="attendance_date" name="attendance_date" value="{{ today }}">
+
+        <table class="attendance-table">
+            <thead>
+                <tr>
+                    <th>Mã SV</th>
+                    <th>Họ và Tên</th>
+                    <th>Trạng thái</th>
+                    <th>Ghi chú</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.studentId }}</td>
+                    <td>{{ student.fullName }}</td>
+                    <td>
+                        <select name="status_{{ student.studentId }}" class="status-select">
+                            <option value="PRESENT">Có mặt</option>
+                            <option value="ABSENT">Vắng</option>
+                            <option value="LATE">Đi muộn</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" name="note_{{ student.studentId }}" class="note-input" placeholder="Ghi chú">
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="text-align: right;">
+            <button type="submit" class="btn-save">Lưu điểm danh</button>
+        </div>
+    </form>
+</div>
+        </div> 
     </div>
 
     {% endblock content %}

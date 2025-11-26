@@ -1,0 +1,63 @@
+/* teacher_classes.css */
+
+.container1 {
+    padding: 20px;
+}
+
+.container1 h2 {
+    color: #1A3E8E;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.container1 p {
+    color: #333;
+    text-align: center;
+}
+
+.classes-grid {
+    display: grid;
+    grid-template-columns: 50%;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.class-card {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.class-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.class-card h3 {
+    color: #1A3E8E;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.class-card p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.btn-enter-grades {
+    display: inline-block;
+    background-color: #1A3E8E;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.btn-enter-grades:hover {
+    background-color: #16306b;
+}

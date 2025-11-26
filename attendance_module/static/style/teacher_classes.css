@@ -1,0 +1,56 @@
+/* Tổng thể container */
+.teacher-classes-container {
+    font-family: Arial, sans-serif;
+}
+
+/* Tiêu đề */
+.teacher-classes-container h2 {
+    color: #1A3E8E; /* xanh nước biển đậm */
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+/* Bảng lớp học */
+.teacher-classes-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Thẻ đầu bảng */
+.teacher-classes-table thead th {
+    background-color: #1A3E8E; /* xanh đậm */
+    color: white;
+    padding: 12px;
+    text-align: center;
+}
+
+/* Hàng trong tbody */
+.teacher-classes-table tbody td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Nút điểm danh */
+.teacher-classes-table tbody td a button {
+    background-color: #1A3E8E;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.teacher-classes-table tbody td a button:hover {
+    background-color: #16306b; /* xanh đậm hơn khi hover */
+}
+
+/* Hàng trống */
+.teacher-classes-table tbody tr td[colspan] {
+    color: #555;
+    font-style: italic;
+}

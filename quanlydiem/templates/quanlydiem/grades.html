@@ -38,28 +38,31 @@
                         <th>Mã lớp</th>
                         <th>Số tín chỉ</th>
                         <th>Thường Xuyên 1</th>
+                        <th>Thường Xuyên 2</th>
                         <th>Giữa kỳ</th>
-                        <th>Thường xuyên 2</th>
                         <th>Cuối kỳ</th>
                         <th>Tổng kết</th>
+                        <th>Thời Gian</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for item in bang_diem %}
+                    {% for item in grades_list %}
                     <tr>
-                        <td class="left-align">{{ item.class_obj.courseId.courseName }}</td>
-                        <td>{{ item.class_obj.classId }}</td>
-                        <td>{{ item.class_obj.courseId.credits }}</td>
-                        <td>{{ item.attendanceScore }}</td>
-                        <td>{{ item.midtermScore }}</td>
-                        <td>{{ item.finalScore }}</td>
-                        <td class="total-score {% if item.totalScore < 4 %}fail{% else %}pass{% endif %}">
-                            {{ item.totalScore|default:"Chưa có" }}
+                        <td class="left-align">{{ item.course_name }}</td>
+                        <td>{{ item.class_id }}</td>
+                        <td>{{ item.credits }}</td>
+                        <td>{{ item.tx1|default:"-" }}</td>
+                        <td>{{ item.tx2|default:"-" }}</td>
+                        <td>{{ item.giua_ky|default:"-" }}</td>
+                        <td>{{ item.cuoi_ky|default:"-" }}</td>
+                        <td class="total-score {% if item.diem_trung_binh < 4 %}fail{% else %}pass{% endif %}">
+                            {{ item.diem_trung_binh|default:"Chưa có" }}
                         </td>
+                        <td>{{ item.created_at}}</td>
                     </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="7">Bạn chưa có điểm môn học nào.</td>
+                            <td colspan="8">Bạn chưa có điểm môn học nào.</td>
                         </tr>
                     {% endfor %}
                 </tbody>

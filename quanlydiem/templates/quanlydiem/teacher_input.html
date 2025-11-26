@@ -1,61 +1,107 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'style/teacher_home.css' %}">
+    <link rel="stylesheet" href="{% static 'style/general.css' %}">
+    <link rel="stylesheet" href="{% static 'style/teacher_classes.css' %}">
+    <link rel="stylesheet" href="{% static 'style/teacher_input.css' %}">
+{% endblock %}
+
+{% block add_sidebar %}
+    <a href="#" class="nav-item" id="send-ann-btn">
+        <i class="fa-solid fa-share-from-square"></i>Gửi thông báo
+    </a>
+
+    <a href="{% url 'teacher_class_list' %}" class="nav-item" id="attendance-btn">
+        <i class="fa-solid fa-user-check"></i>Điểm danh
+    </a>
+
+    <a href="{% url 'teacher_grade_dashboard' %}" class="nav-item active">
+        <i class="fa-solid fa-pen-to-square"></i> Quản lý điểm
+    </a>
+    
+    <div id="announcement-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h4>Gửi thông báo</h4>
+            <form id="announcement-form" method="post">
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                <div class="title">
+                    <label>Mã Lớp:</label>
+                    <input type="text" name="classId" required>
+                </div>
+                <div class="title">
+                    <label>Tiêu đề:</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="content">
+                    <label>Nội dung:</label>
+                    <textarea name="content" required></textarea>
+                </div>
+                <button type="submit" class="signin">Gửi</button>
+            </form>
+            <p id="msg" style="color: green;"></p>
+        </div>
+    </div>
+{% endblock add_sidebar %}
+
+{% block user_info %}
+    <div class="get-username" data-role="{{ user_role }}">
+        Xin chào, {{ username }}<br> 
+        <span style="font-size: 16px;">Giảng Viên</span>
+    </div>
+{% endblock user_info %}
+
 {% block title %}Nhập điểm {{ lop.classId }}{% endblock %}
 
 {% block content %}
-<div style="padding: 20px; margin-left: 260px;">
-    <a href="{% url 'teacher_grade_dashboard' %}" style="text-decoration: none; color: gray; margin-bottom: 20px; display: inline-block;">
+<div class="container2">
+    <a href="{% url 'teacher_grade_dashboard' %}" class="back-link">
         <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách lớp
     </a>
 
-    <h2>Nhập điểm lớp: <span style="color: blue;">{{ lop.classId }}</span> - {{ lop.courseId.courseName }}</h2>
+    <h2 class="page-title">
+        Nhập điểm lớp: <span>{{ lop.classId }}</span> - {{ lop.courseName }}
+    </h2>
     
     <form method="POST">
         {% csrf_token %}
-        
-        <style>
-            .grade-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
-            .grade-table th, .grade-table td { border: 1px solid #ddd; padding: 10px; text-align: center; }
-            .grade-table th { background-color: #f2f2f2; }
-            .grade-input { width: 60px; text-align: center; padding: 5px; }
-            .btn-save { padding: 12px 25px; background: #4CAF50; color: white; border: none; cursor: pointer; font-size: 16px; margin-top: 15px; border-radius: 4px; }
-            .btn-save:hover { background: #45a049; }
-        </style>
-
         <table class="grade-table">
             <thead>
                 <tr>
                     <th>Mã SV</th>
                     <th>Họ và Tên</th>
-                    <th>Chuyên cần (10%)</th>
-                    <th>Giữa kỳ (30%)</th>
-                    <th>Cuối kỳ (60%)</th>
+                    <th>TX1</th>
+                    <th>TX2</th>
+                    <th>Giữa kỳ</th>
+                    <th>Cuối kỳ</th>
                     <th>Tổng kết</th>
                 </tr>
             </thead>
             <tbody>
-                {% for item in data %}
+                {% for item in students %}
                 <tr>
-                    <td>{{ item.sv.pk }}</td>
-                    <td>{{ item.sv.fullName }}</td>
+                    <td>{{ item.studentId }}</td>
+                    <td>{{ item.fullName }}</td>
                     <td>
                         <input type="number" step="0.1" min="0" max="10" class="grade-input"
-                               name="cc_{{ item.sv.pk }}" 
-                               value="{{ item.diem.attendanceScore|default:0 }}">
+                               name="tx1_{{ item.studentId }}" value="{{ item.tx1|default:'' }}">
                     </td>
                     <td>
                         <input type="number" step="0.1" min="0" max="10" class="grade-input"
-                               name="gk_{{ item.sv.pk }}" 
-                               value="{{ item.diem.midtermScore|default:0 }}">
+                               name="tx2_{{ item.studentId }}" value="{{ item.tx2|default:'' }}">
                     </td>
                     <td>
                         <input type="number" step="0.1" min="0" max="10" class="grade-input"
-                               name="ck_{{ item.sv.pk }}" 
-                               value="{{ item.diem.finalScore|default:0 }}">
+                               name="giua_ky_{{ item.studentId }}" value="{{ item.giua_ky|default:'' }}">
                     </td>
-                    <td style="font-weight: bold; color: red;">
-                        {{ item.diem.totalScore|default:"..." }}
+                    <td>
+                        <input type="number" step="0.1" min="0" max="10" class="grade-input"
+                               name="cuoi_ky_{{ item.studentId }}" value="{{ item.cuoi_ky|default:'' }}">
+                    </td>
+                    <td class="total-score">
+                        {{ item.diem_trung_binh|default:"..." }}
                     </td>
                 </tr>
                 {% endfor %}
@@ -68,3 +114,8 @@
     </form>
 </div>
 {% endblock %}
+
+
+{% block scripts %}
+    <script src="{% static 'style/teacher_home_api.js'%}"></script>
+{% endblock scripts %}

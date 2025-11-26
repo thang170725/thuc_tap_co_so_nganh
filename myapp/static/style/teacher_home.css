@@ -189,3 +189,13 @@
         font-size: 14px;
     }
 }
+
+/* 
+===========================
+=== STYLE XUẤT FILE =======
+===========================
+*/
+.classes-list > div > #export-btn{
+    display: inline-block;
+    margin-left: 90%;
+}

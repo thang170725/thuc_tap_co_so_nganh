@@ -1,0 +1,43 @@
+/* attendance.css */
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+}
+
+.attendance-table th, .attendance-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.attendance-table th {
+    background-color: #1A3E8E;
+    color: white;
+}
+
+.status-select {
+    padding: 5px;
+    text-align: center;
+}
+
+.note-input {
+    width: 150px;
+    padding: 5px;
+}
+
+.btn-save {
+    padding: 12px 25px;
+    background: #1A3E8E;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+    border-radius: 4px;
+}
+
+.btn-save:hover {
+    background: #16306b;
+}

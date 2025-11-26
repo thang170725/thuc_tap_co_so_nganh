@@ -1,12 +1,77 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Danh sách Lớp học - {{ teacher_name }}</title>
-</head>
-<body>
-    <h2>📚 Các Lớp học do {{ teacher_name }} phụ trách</h2>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Thời khóa biểu Giảng viên{% endblock title %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'style/teacher_home.css' %}">
+    <link rel="stylesheet" href="{% static 'style/general.css' %}">
+    <link rel="stylesheet" href="{% static 'style/teacher_classes.css' %}">
+{% endblock %}
+
+{% block add_sidebar %}
+    <a href="#" class="nav-item" id="send-ann-btn">
+        <i class="fa-solid fa-share-from-square"></i>Gửi thông báo
+    </a>
+
+    <a href="{% url 'teacher_class_list' %}" class="nav-item active" id="attendance-btn">
+        <i class="fa-solid fa-user-check"></i>Điểm danh
+    </a>
+
+    <a href="{% url 'teacher_grade_dashboard' %}" class="nav-item">
+        <i class="fa-solid fa-pen-to-square"></i> Quản lý điểm
+    </a>
     
-    <table border="1" style="width: 80%; border-collapse: collapse;">
+    <div id="announcement-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h4>Gửi thông báo</h4>
+            <form id="announcement-form" method="post">
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                <div class="title">
+                    <label>Mã Lớp:</label>
+                    <input type="text" name="classId" required>
+                </div>
+                <div class="title">
+                    <label>Tiêu đề:</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="content">
+                    <label>Nội dung:</label>
+                    <textarea name="content" required></textarea>
+                </div>
+                <button type="submit" class="signin">Gửi</button>
+            </form>
+            <p id="msg" style="color: green;"></p>
+        </div>
+    </div>
+{% endblock add_sidebar %}
+
+
+{% block role_specific_links %}
+{% endblock role_specific_links %}
+
+{% block user_info %}
+    <div class="get-username" data-role="{{ user_role }}">
+        Xin chào, {{ teacher_name }}<br> 
+        <span style="font-size: 16px;">Giảng Viên</span>
+    </div>
+{% endblock user_info %}
+
+{% block content %}
+    <div class="classes-list">
+        <h4>Thời khóa biểu</h4>
+
+        <section class="week-view">               
+            <ul class="week-days"></ul>
+            <div id="weather-container"></div>
+        </section>
+
+        <div>
+            <div class="teacher-classes-container">
+    <h2>📚 Các Lớp học do {{ teacher_name }} phụ trách</h2>
+
+    <table class="teacher-classes-table">
         <thead>
             <tr>
                 <th>Mã Lớp</th>
@@ -16,25 +81,30 @@
             </tr>
         </thead>
         <tbody>
-        {% for cls in class_list %}
+            {% for cls in class_list %}
             <tr>
                 <td>{{ cls.classId }}</td>
                 <td>{{ cls.courseName }}</td>
                 <td>{{ cls.semester }}</td>
                 <td>
                     <a href="{% url 'teacher_attendance' class_id=cls.classId %}">
-                        <button type="button" style="background-color: #007bff; color: white; padding: 5px 10px;">
-                            Điểm danh
-                        </button>
+                        <button type="button">Điểm danh</button>
                     </a>
                 </td>
             </tr>
-        {% empty %}
-            <tr>
-                <td colspan="4">Không tìm thấy lớp học nào.</td>
-            </tr>
-        {% endfor %}
+            {% empty %}
+                <tr>
+                    <td colspan="4">Không tìm thấy lớp học nào.</td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
-</body>
-</html>
+</div>
+        </div>   
+    </div>
+
+    {% endblock content %}
+
+{% block scripts %}
+    <script src="{% static 'style/teacher_home_api.js'%}"></script>
+{% endblock scripts %}

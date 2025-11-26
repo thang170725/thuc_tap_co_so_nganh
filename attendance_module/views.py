@@ -1,4 +1,3 @@
-# attendance_module/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import IntegrityError
 # --- THÊM IMPORT NÀY ĐỂ TÍNH TOÁN THỐNG KÊ ---
@@ -6,6 +5,81 @@ from django.db.models import Count, Q
 from datetime import date
 from .forms import AttendanceFormSet
 from myapp.models import Classes, Teachers, Courses, Students_Classes, Students, Attendances
+from django.shortcuts import render, redirect
+from django.db import connection
+from django.utils import timezone
+
+# ======================== HÀM PHỤ TRANG GIẢNG VIÊN ========================
+def fetch_teachername(user_id):
+  with connection.cursor() as cursor:
+    cursor.execute('''
+      select fullName
+      from Teachers
+      where teacherId = %s 
+    ''', [user_id])
+    row = cursor.fetchone()
+  return row[0] if row else None
+
+def teacher_attendance(request, class_id):
+    # Lấy danh sách sinh viên trong lớp
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT s.studentId, s.fullName
+            FROM Students s
+            join Students_Classes sl on s.studentId = sl.studentId
+            JOIN Classes cl ON sl.classId = cl.classId 
+            WHERE sl.classId = %s
+        """, [class_id])
+        students_result = cursor.fetchall()
+
+    students = [{'studentId': s[0], 'fullName': s[1]} for s in students_result]
+
+    if request.method == 'POST':
+        attendance_date = request.POST.get('attendance_date')
+        if not attendance_date:
+            attendance_date = timezone.now().date()  # mặc định ngày hôm nay
+
+        with connection.cursor() as cursor:
+            for student in students:
+                student_id = student['studentId']
+                status = request.POST.get(f'status_{student_id}', 'PRESENT')
+                note = request.POST.get(f'note_{student_id}', '')
+
+                # Kiểm tra nếu bản ghi đã tồn tại cho ngày đó
+                cursor.execute("""
+                    SELECT attendanceId FROM Attendances
+                    WHERE classId=%s AND studentId=%s AND date=%s
+                """, [class_id, student_id, attendance_date])
+                existing = cursor.fetchone()
+
+                if existing:
+                    cursor.execute("""
+                        UPDATE Attendances
+                        SET status=%s, note=%s, created_at=CURRENT_TIMESTAMP
+                        WHERE attendanceId=%s
+                    """, [status, note, existing[0]])
+                else:
+                    cursor.execute("""
+                        INSERT INTO Attendances(classId, studentId, date, status, note)
+                        VALUES (%s, %s, %s, %s, %s)
+                    """, [class_id, student_id, attendance_date, status, note])
+
+        return redirect('teacher_attendance', class_id=class_id)
+
+    # lấy tên giảng viên
+    user_id = request.session.get('userId')
+    print("DEBUG userId =", request.session.get('userId'))
+    if not user_id:
+        return redirect('login')
+    username = fetch_teachername(user_id)
+    context = {
+        'username': username,
+        'user_role': 'TEACHER',
+        'class_id': class_id,
+        'students': students,
+        'today': timezone.now().date()
+    }
+    return render(request, 'attendance_module/teacher_attendance.html', context)
 
 def teacher_class_list(request):
     # GIẢ ĐỊNH: Giảng viên hiện tại là 'T001'
